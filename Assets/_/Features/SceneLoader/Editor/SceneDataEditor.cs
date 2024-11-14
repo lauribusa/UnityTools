@@ -13,19 +13,28 @@ namespace SceneLoader.Editor
         public static bool OnDoubleClick(int instanceId, int line, int row)
         {
             Object target = EditorUtility.InstanceIDToObject(instanceId);
-
             switch (target)
             {
                 case SceneData sceneData:
-                    if(loadedData != null)
-                    {
-                        loadedData.CloseSceneEditor();
-                    }
-                    sceneData.LoadScenesEditor();
-                    loadedData = sceneData;                    
+                    LoadSceneEditor(sceneData);
                     return true;
                 default:
                     return false;
+            }
+        }
+
+        public static void LoadSceneEditor(SceneData sceneData)
+        {
+            UnloadSceneEditor();
+            sceneData.LoadScenesEditor();
+            loadedData = sceneData;
+        }
+
+        public static void UnloadSceneEditor()
+        {
+            if(loadedData != null)
+            {
+                loadedData.CloseSceneEditor();
             }
         }
     }

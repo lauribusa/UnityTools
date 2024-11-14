@@ -5,96 +5,119 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 namespace SceneLoader.Data
 {
     [CreateAssetMenu(menuName = "Game/SceneData")]
     public class SceneData : ScriptableObject
     {
-        #region Publics
-        public int[] sceneIndices;
-        public AssetReference[] scenes;
-        private List<Scene> _activeScenesInEditor = new();
+        #region Variables
+        [FormerlySerializedAs("scenes")] public AssetReference[] sceneAssetReferences;
         private List<SceneInstance> _instances = new();
 
         #endregion
 
         #region Public API
 
-        public bool IsSceneValid(GUID guid)
+        public void LoadScenes()
         {
-            for (int i = 0; i < EditorBuildSettings.scenes.Length; i++)
-            {
-                if (EditorBuildSettings.scenes[i].guid == guid) return true;
-            }
-            Debug.LogError($"ERROR: No valid scene found for guid {guid}. Perhaps missing from the build settings?");
-            return false;
+            #if UNITY_EDITOR
+            LoadScenesEditor();
+            #else
+            LoadScenesRuntime();
+            #endif
         }
+        
+        #endregion
+        
+        #region Editor Functions
         public void LoadScenesEditor()
         {
-            for (int i = 0; i < sceneIndices.Length; i++)
+            for (int i = 0; i < sceneAssetReferences.Length; i++)
             {
-
-                var scenePath = EditorBuildSettings.scenes[i].path;
-                if (!IsSceneValid(AssetDatabase.GUIDFromAssetPath(scenePath))) continue;
-                if (sceneIndices[i] == 0)
-                {
-                    _activeScenesInEditor.Add(EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single));
-                    continue;
-                }
-                _activeScenesInEditor.Add(EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Additive));
+                if (!IsSceneValid(sceneAssetReferences[i], out var path)) continue;
+                EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
             }
         }
-
+        
         public void CloseSceneEditor()
         {
-            var count = _activeScenesInEditor.Count;
-            for (int i = count-1; i > 0; i--)
+            for (int i = 0; i < sceneAssetReferences.Length; i++)
             {
-                var scene = _activeScenesInEditor[i];
+                if (!IsSceneValid(sceneAssetReferences[i], out var path)) continue;
+                var scene = EditorSceneManager.GetSceneByPath(path);
                 EditorSceneManager.CloseScene(scene, true);
-                _activeScenesInEditor.Remove(scene);
             }
         }
 
         #endregion
-
-        public async void LoadScenes()
+        
+        #region Runtime Functions
+        public async void LoadScenesRuntime()
         {
-            for (int i = 0; i < scenes.Length; i++)
+            for (int i = 0; i < sceneAssetReferences.Length; i++)
             {
                 SceneInstance result;
                 if (i == 0)
                 {
-                    var loadHandle = Addressables.LoadSceneAsync(scenes[i], LoadSceneMode.Single);
+                    var loadHandle = Addressables.LoadSceneAsync(sceneAssetReferences[i], LoadSceneMode.Single);
                     result = await loadHandle.Task;
-                    AddToLoadedScenes(result);
+                    AddToLoadedScenesRuntime(result);
                     continue;
                 }
-                var handle = Addressables.LoadSceneAsync(scenes[i], LoadSceneMode.Additive);
+                var handle = Addressables.LoadSceneAsync(sceneAssetReferences[i], LoadSceneMode.Additive);
                 result = await handle.Task;
-                AddToLoadedScenes(result);
+                AddToLoadedScenesRuntime(result);
             }
         }
 
-        private void AddToLoadedScenes(SceneInstance scene)
+        private void AddToLoadedScenesRuntime(SceneInstance scene)
         {
             _instances.Add(scene);
         }
-
-        public async void CloseScene()
+        
+        public async void CloseSceneRuntime()
         {
             var count = _instances.Count;
             for (int i = count - 1; i > 0; i--)
             {
                 var result = await Addressables.UnloadSceneAsync(_instances[i]).Task;
-                RemoveFromLoadedScenes(result);
+                RemoveFromLoadedScenesRuntime(result);
             }
         }
 
-        private void RemoveFromLoadedScenes(SceneInstance scene)
+        private void RemoveFromLoadedScenesRuntime(SceneInstance scene)
         {
             _instances.Remove(scene);
         }
+        
+        #endregion
+
+        #region Private
+
+        private bool IsSceneValid(AssetReference assetReference)
+        {
+            var path = AssetDatabase.GUIDToAssetPath(assetReference.AssetGUID);
+            for (int i = 0; i < EditorBuildSettings.scenes.Length; i++)
+            {
+                if (EditorBuildSettings.scenes[i].path == path) return true;
+            }
+            Debug.LogError($"ERROR: No valid scene found for path {path}. Perhaps missing from the build settings?");
+            return false;
+        }
+        
+        private bool IsSceneValid(AssetReference assetReference, out string path)
+        {
+            path = AssetDatabase.GUIDToAssetPath(assetReference.AssetGUID);
+            for (int i = 0; i < EditorBuildSettings.scenes.Length; i++)
+            {
+                if (EditorBuildSettings.scenes[i].path == path) return true;
+            }
+            Debug.LogError($"ERROR: No valid scene found for path {path}. Perhaps missing from the build settings?");
+            return false;
+        }    
+
+        #endregion
     }
 }
