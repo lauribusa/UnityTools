@@ -1,0 +1,16 @@
+{
+    "name": "SceneLoader.Runtime",
+    "rootNamespace": "SceneLoader.Runtime",
+    "references": [
+        "GUID:4dce9ecd4b306fc47bc5df3caf12f2bf"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
