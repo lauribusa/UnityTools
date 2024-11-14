@@ -1,7 +1,11 @@
 {
     "name": "FeatureFactory.Editor",
     "rootNamespace": "FeatureFactory.Editor",
-    "references": ["GUID:8d62da4aabd2a19419c7378d23ea5849"],
+    "references": [
+        "GUID:8d62da4aabd2a19419c7378d23ea5849",
+        "GUID:ef49db1bb3b620b42ae657f7a87e80d8",
+        "GUID:da36f823d6ff51b4c8fa52118d367475"
+    ],
     "includePlatforms": [
         "Editor"
     ],

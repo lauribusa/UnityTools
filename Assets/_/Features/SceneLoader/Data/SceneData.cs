@@ -23,6 +23,11 @@ namespace SceneLoader.Data
         public void LoadScenes()
         {
             #if UNITY_EDITOR
+            if (Application.isPlaying)
+            {
+                LoadScenesRuntime();
+                return;
+            }
             LoadScenesEditor();
             #else
             LoadScenesRuntime();

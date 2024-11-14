@@ -1,10 +1,11 @@
 using Paps.UnityToolbarExtenderUIToolkit;
+using Toolbar.Editor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SceneLoader.Editor
 {
-    [MainToolbarElement("ScenesLoaderRuntimeOverride", ToolbarAlign.Right, order: 0)]
+    [MainToolbarElement("ScenesLoaderRuntimeOverride", order: 0)]
     public class SceneDataLoaderRuntimeOverride: Toggle
     {
         [Serialize] 

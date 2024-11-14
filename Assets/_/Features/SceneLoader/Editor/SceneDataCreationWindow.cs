@@ -1,6 +1,7 @@
 using System.IO;
 using SceneLoader.Data;
 using UnityEditor;
+using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -11,6 +12,7 @@ namespace SceneLoader.Editor
         private bool _isFocused;
         private TextField _sceneDataName;
         private Button _confirm;
+        [MenuItem("Assets/Create/SceneData", priority = 12)]
         public static void ShowWindow()
         {
             var wnd = GetWindow<SceneDataCreationWindow>();
@@ -49,6 +51,10 @@ namespace SceneLoader.Editor
             sceneData.name = sceneDataName;
             AssetDatabase.CreateAsset(sceneData, $@"{PATH}\{sceneDataName}.{ASSET}");
             AssetDatabase.SaveAssets();
+            ShowNotification(new GUIContent("Created Asset."));
+            System.Threading.Tasks.Task.Delay(100);
+            AssetDatabase.Refresh();
+            EditorGUIUtility.PingObject(sceneData);
         }
         
         private static bool FileAlreadyExists(string fileName)

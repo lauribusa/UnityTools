@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 
 namespace SceneLoader.Editor
 {
-    [MainToolbarElement("ScenesLoader", ToolbarAlign.Right, order: 1)]
+    [MainToolbarElement("ScenesLoader", order: 1)]
     public class SceneDataField : ObjectField
     {
         public void InitializeElement()

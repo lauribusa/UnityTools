@@ -1,6 +1,5 @@
 ﻿using SceneLoader.Data;
 using UnityEditor;
-using UnityEngine;
 using OnOpenAsset = UnityEditor.Callbacks.OnOpenAssetAttribute;
 
 namespace SceneLoader.Editor
@@ -8,11 +7,11 @@ namespace SceneLoader.Editor
     [CustomEditor(typeof(SceneData))]
     public class SceneLoaderEditor : UnityEditor.Editor
     {
-        static SceneData loadedData;
+        private static SceneData _loadedData;
         [OnOpenAsset]
         public static bool OnDoubleClick(int instanceId, int line, int row)
         {
-            Object target = EditorUtility.InstanceIDToObject(instanceId);
+            var target = EditorUtility.InstanceIDToObject(instanceId);
             switch (target)
             {
                 case SceneData sceneData:
@@ -27,14 +26,14 @@ namespace SceneLoader.Editor
         {
             UnloadSceneEditor();
             sceneData.LoadScenesEditor();
-            loadedData = sceneData;
+            _loadedData = sceneData;
         }
 
         public static void UnloadSceneEditor()
         {
-            if(loadedData != null)
+            if(_loadedData != null)
             {
-                loadedData.CloseSceneEditor();
+                _loadedData.CloseSceneEditor();
             }
         }
     }

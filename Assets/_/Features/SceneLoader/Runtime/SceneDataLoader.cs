@@ -5,9 +5,6 @@ namespace SceneLoader.Runtime
 {
     public class SceneDataLoader : MonoBehaviour
     {
-        #region Public
-        #endregion
-
         #region Private & Protected
         [SerializeField]
         private SceneData _sceneData;
@@ -23,9 +20,6 @@ namespace SceneLoader.Runtime
             }
             _sceneData!.LoadScenes();
         }
-        #endregion
-
-        #region Main
         #endregion
     }
 }
