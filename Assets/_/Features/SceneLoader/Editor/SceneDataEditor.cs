@@ -46,9 +46,10 @@ namespace SceneLoader.Editor
         {
             var sceneData = serializedObject.targetObject as SceneData;
             if (sceneData == null) return;
-            var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene);
+            var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
             var composedPath = $@"{PATH}\{sceneName}.{UNITY}";
             EditorSceneManager.SaveScene(scene, composedPath);
+            EditorSceneManager.CloseScene(scene, true);
             var sceneGuid = AssetDatabase.AssetPathToGUID(composedPath);
             var assetReference = new AssetReference(sceneGuid);
             List<AssetReference> referenceList = new(_loadedData.sceneAssetReferences) { assetReference };
