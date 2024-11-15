@@ -12,7 +12,7 @@ namespace AddressableTools.Editor
         {
             text = "Addressable Build";
             clicked += OnClick;
-            ToolCollection.OnChanged += OnToolbarTypeChanged;
+            ToolEvent.OnChanged += OnToolbarTypeChanged;
         }
 
         private void OnClick()

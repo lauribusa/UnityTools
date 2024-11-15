@@ -9,11 +9,13 @@ namespace SceneLoader.Editor
     [MainToolbarElement("ScenesLoader", order: 1)]
     public class SceneDataField : ObjectField
     {
+        [Serialize] 
+        private SceneData _sceneData;
         public void InitializeElement()
         {
             label = "Load:";
             objectType = typeof(SceneData);
-            this.RegisterValueChangedCallback(OnObjectFieldValueChanged);
+            RegisterCallback<ChangeEvent<Object>>(OnObjectFieldValueChanged);
         }
         private void OnObjectFieldValueChanged(ChangeEvent<Object> evt)
         {
@@ -23,13 +25,18 @@ namespace SceneLoader.Editor
             }
             else
             {
-                SceneLoaderEditor.UnloadSceneEditor();
+                SceneLoaderEditor.UnloadSceneData();
             }
         }
 
         private void LoadSceneData(SceneData sceneData)
         {
-            SceneLoaderEditor.LoadSceneEditor(sceneData);
+            SceneLoaderEditor.LoadSceneData(sceneData);
+        }
+
+        private void UnloadSceneData()
+        {
+            SceneLoaderEditor.UnloadSceneData();
         }
     }
 }

@@ -13,7 +13,7 @@ namespace FeatureFactory.Editor
         {
             text = "Add Feature";
             clicked += OnClick;
-            ToolCollection.OnChanged += OnToolbarTypeChanged;
+            ToolEvent.OnChanged += OnToolbarTypeChanged;
         }
 
         private void OnClick()

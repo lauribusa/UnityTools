@@ -1,6 +1,5 @@
 using Paps.UnityToolbarExtenderUIToolkit;
 using Toolbar.Editor;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SceneLoader.Editor
@@ -13,7 +12,7 @@ namespace SceneLoader.Editor
            text = "ScenesCreator";
            clicked += OnClick;
            style.display = DisplayStyle;
-           ToolCollection.OnChanged += OnToolbarTypeChanged;
+           ToolEvent.OnChanged += OnToolbarTypeChanged;
         }
 
         private static void OnClick()
@@ -28,18 +27,6 @@ namespace SceneLoader.Editor
         public void OnToolbarTypeChanged(string value)
         {
             style.display = value == Type ? DisplayStyle.Flex : DisplayStyle.None;
-        }
-
-        public void Hide()
-        {
-            Debug.Log($"hiding");
-            style.display = DisplayStyle.None;
-        }
-
-        public void Show()
-        {
-            Debug.Log($"showing");
-            style.display = DisplayStyle.Flex;
         }
     }
 }

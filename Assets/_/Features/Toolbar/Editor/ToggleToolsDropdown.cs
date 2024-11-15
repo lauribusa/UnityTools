@@ -20,13 +20,13 @@ namespace Toolbar.Editor
             label = "Tools";
             RegisterCallback<ChangeEvent<string>>(OnChange);
             await System.Threading.Tasks.Task.Delay(100);
-            ToolCollection.OnChanged?.Invoke(_selectedTool);
+            ToolEvent.OnChanged?.Invoke(_selectedTool);
         }
 
         private void OnChange(ChangeEvent<string> evt)
         {
             _selectedTool = evt.newValue;
-            ToolCollection.OnChanged.Invoke(evt.newValue);
+            ToolEvent.OnChanged.Invoke(evt.newValue);
         }
     }
 
@@ -38,10 +38,8 @@ namespace Toolbar.Editor
         public static readonly string[] All = { ADDRESSABLE, SCENE_DATA, FEATURES };
     }
 
-    public static class ToolCollection
+    public static class ToolEvent
     {
-        private static readonly List<IToolbarElement> TOOLBAR_ELEMENTS = new();
-        private static string _selectedTool = ToolType.All[0];
         public static Action<string> OnChanged;
     }
 
@@ -49,7 +47,6 @@ namespace Toolbar.Editor
     {
         public DisplayStyle DisplayStyle { get; set; }
         public string Type { get; set; }
-
         public void OnToolbarTypeChanged(string value);
     }
 }

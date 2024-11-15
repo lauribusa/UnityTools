@@ -15,11 +15,9 @@ namespace SceneLoader.Data
         #region Variables
         [FormerlySerializedAs("scenes")] public AssetReference[] sceneAssetReferences;
         private List<SceneInstance> _instances = new();
-
         #endregion
 
         #region Public API
-
         public void LoadScenes()
         {
             #if UNITY_EDITOR
@@ -33,7 +31,6 @@ namespace SceneLoader.Data
             LoadScenesRuntime();
             #endif
         }
-        
         #endregion
         
         #region Editor Functions
@@ -55,7 +52,6 @@ namespace SceneLoader.Data
                 EditorSceneManager.CloseScene(scene, true);
             }
         }
-
         #endregion
         
         #region Runtime Functions
@@ -96,22 +92,9 @@ namespace SceneLoader.Data
         {
             _instances.Remove(scene);
         }
-        
         #endregion
 
         #region Private
-
-        private bool IsSceneValid(AssetReference assetReference)
-        {
-            var path = AssetDatabase.GUIDToAssetPath(assetReference.AssetGUID);
-            for (int i = 0; i < EditorBuildSettings.scenes.Length; i++)
-            {
-                if (EditorBuildSettings.scenes[i].path == path) return true;
-            }
-            Debug.LogError($"ERROR: No valid scene found for path {path}. Perhaps missing from the build settings?");
-            return false;
-        }
-        
         private bool IsSceneValid(AssetReference assetReference, out string path)
         {
             path = AssetDatabase.GUIDToAssetPath(assetReference.AssetGUID);
