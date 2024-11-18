@@ -6,8 +6,10 @@ using SceneLoader.Data;
 using SceneLoader.Runtime;
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.UIElements;
 using OnOpenAsset = UnityEditor.Callbacks.OnOpenAssetAttribute;
 
 namespace SceneLoader.Editor
@@ -31,42 +33,61 @@ namespace SceneLoader.Editor
             }
         }
 
-        public override void OnInspectorGUI()
+        public override VisualElement CreateInspectorGUI()
         {
-            DrawDefaultInspector();
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Scene Data", GUILayout.MaxWidth(100f));
-            _sceneName = GUILayout.TextField(_sceneName);
-            GUILayout.EndHorizontal();
-            if (GUILayout.Button(new GUIContent("Create Scene")))
-            {
-                if (FileAlreadyExists(_sceneName))
-                {
-                    EditorUtility.DisplayDialog("Error", $@"A file at path {PATH}\{_sceneName}.{UNITY}\ already exists.", "OK");
-                    return;
-                }
 
-                if (!IsValidFilename(_sceneName) || string.IsNullOrWhiteSpace(_sceneName))
+            var root = new VisualElement();
+            InspectorElement.FillDefaultInspector(root, serializedObject, this);
+            var buttonGroup = new VisualElement
+            {
+                style =
                 {
-                    EditorUtility.DisplayDialog("Error", $"The name is empty or contains invalid characters.", "OK");
-                    return;
+                    flexDirection = FlexDirection.Row
                 }
-                if (EditorUtility.DisplayDialog("Create Scene", $"Do you wish to create the scene {_sceneName}?", "OK",
-                        "Cancel"))
-                {
-                    CreateScene(_sceneName);
-                }
+            };
+            var textField = new TextField(_sceneName) { label= "Scene Name", style = { flexGrow = 1} };
+            var createButton = new Button(OnCreateSceneEvent) { text = "Create Scene" };
+            var deleteButton = new Button(OnDeleteSceneEvent) { text = "Delete Scene" };
+            textField.RegisterCallback<ChangeEvent<string>>(OnTextChange);
+            buttonGroup.Add(textField);
+            root.Add(buttonGroup);
+            root.Add(createButton);
+            root.Add(deleteButton);
+            return root;
+        }
+
+        private void OnTextChange(ChangeEvent<string> evt)
+        {
+            _sceneName = evt.newValue;
+        }
+        
+        private void OnDeleteSceneEvent()
+        {
+            if (EditorUtility.DisplayDialog("Delete Scene", $"Do you wish to delete the last scene?", "OK",
+                    "Cancel"))
+            {
+                DeleteScene();
+            }
+        }
+
+        private void OnCreateSceneEvent()
+        {
+            if (FileAlreadyExists(_sceneName))
+            {
+                EditorUtility.DisplayDialog("Error", $@"A file at path {PATH}\{_sceneName}.{UNITY}\ already exists.", "OK");
+                return;
             }
 
-            if (GUILayout.Button(new GUIContent("Delete Scene")))
+            if (!IsValidFilename(_sceneName) || string.IsNullOrWhiteSpace(_sceneName))
             {
-                if (EditorUtility.DisplayDialog("Delete Scene", $"Do you wish to delete the last scene?", "OK",
-                        "Cancel"))
-                {
-                    DeleteScene();
-                }
+                EditorUtility.DisplayDialog("Error", $"The name is empty or contains invalid characters.", "OK");
+                return;
             }
-            
+            if (EditorUtility.DisplayDialog("Create Scene", $"Do you wish to create the scene {_sceneName}?", "OK",
+                    "Cancel"))
+            {
+                CreateScene(_sceneName);
+            }
         }
 
         private void CreateScene(string sceneName)
