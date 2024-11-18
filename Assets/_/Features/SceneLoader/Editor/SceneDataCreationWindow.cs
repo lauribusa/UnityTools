@@ -1,4 +1,5 @@
 using System.IO;
+using System.Text.RegularExpressions;
 using SceneLoader.Data;
 using UnityEditor;
 using UnityEngine;
@@ -27,7 +28,9 @@ namespace SceneLoader.Editor
             _confirm = new Button(() =>
             {
                 if (FileAlreadyExists(_sceneDataName.value)) return;
-                CreateNewSceneData(_sceneDataName.value);
+                if (!IsValidFilename(_sceneDataName.value)) return;
+                if (string.IsNullOrWhiteSpace(_sceneDataName.value)) return; 
+                    CreateNewSceneData(_sceneDataName.value);
             })
             {
                 text = "Create"
@@ -61,6 +64,12 @@ namespace SceneLoader.Editor
             if (!File.Exists($@"{PATH}\{fileName}.{ASSET}")) return false;
             EditorUtility.DisplayDialog("Error", $@"File at path {PATH}\{fileName}.{ASSET} already exists.", "OK");
             return true;
+        }
+
+        private static bool IsValidFilename(string testName)
+        {
+            var containsABadCharacter = new Regex("["+ Regex.Escape(new string(Path.GetInvalidFileNameChars())) +"]");
+            return !containsABadCharacter.IsMatch(testName);
         }
 
         private const string PATH = @"Assets\_\Features\SceneLoader\Data";

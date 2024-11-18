@@ -57,18 +57,11 @@ namespace SceneLoader.Data
         #region Runtime Functions
         public async void LoadScenesRuntime()
         {
-            for (int i = 0; i < sceneAssetReferences.Length; i++)
+            for (var index = 0; index < sceneAssetReferences.Length; index++)
             {
-                SceneInstance result;
-                if (i == 0)
-                {
-                    var loadHandle = Addressables.LoadSceneAsync(sceneAssetReferences[i], LoadSceneMode.Single);
-                    result = await loadHandle.Task;
-                    AddToLoadedScenesRuntime(result);
-                    continue;
-                }
-                var handle = Addressables.LoadSceneAsync(sceneAssetReferences[i], LoadSceneMode.Additive);
-                result = await handle.Task;
+                var asset = sceneAssetReferences[index];
+                var handle = Addressables.LoadSceneAsync(asset, LoadSceneMode.Additive);
+                var result = await handle.Task;
                 AddToLoadedScenesRuntime(result);
             }
         }

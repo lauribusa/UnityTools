@@ -2,8 +2,7 @@
     "name": "SceneLoader.Runtime",
     "rootNamespace": "SceneLoader.Runtime",
     "references": [
-        "GUID:4dce9ecd4b306fc47bc5df3caf12f2bf",
-        "GUID:adf19d94cce7ef84887193b15d091a75"
+        "GUID:4dce9ecd4b306fc47bc5df3caf12f2bf"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
