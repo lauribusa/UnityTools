@@ -58,12 +58,16 @@ namespace _.Features.Symlink.Editor
 
         private void ConfirmSymlinkToggles()
         {
-            var path = $@"{Directory.GetCurrentDirectory()}\{LINK_PATH}";
+            var link_path = $@"{Directory.GetCurrentDirectory()}\{LINK_PATH}";
+            var origin_path = $@"{Directory.GetCurrentDirectory()}\{ORIGIN_PATH}";
             var vals = _folderGroup.GetActivatedFoldersAndSubfolders();
             foreach (var v in vals)
             {
-                var targetDirectory = new DirectoryInfo($@"{path}\{v.Item1}");
-                Debug.Log($"{v.Item1} : {v.Item2} ({targetDirectory.FullName}) {targetDirectory.Exists}");
+                var targetDirectory = new DirectoryInfo($@"{link_path}\{v.Item1}");
+                var originDirectory = new DirectoryInfo($@"{origin_path}\{v.Item1}");
+                Debug.Log($"{v.Item1} : {v.Item2}");
+                Debug.Log($"link: ({targetDirectory.FullName}) {targetDirectory.Exists}");
+                Debug.Log($"origin: ({originDirectory.FullName}) {originDirectory.Exists}");
             }
         }
 
