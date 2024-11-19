@@ -1,13 +1,12 @@
-using System.Runtime.CompilerServices;
 using SceneLoader.Data;
 using UnityEngine;
 
 namespace SceneLoader.Runtime
 {
-    public class SceneDataLoader : MonoBehaviour
+    public class SceneDataState : MonoBehaviour
     {
         #region Private & Protected
-        public static SceneDataLoader Instance { get; private set; }
+        public static SceneDataState Instance { get; private set; }
         [SerializeField]
         private SceneData sceneData;
         #endregion
@@ -16,7 +15,7 @@ namespace SceneLoader.Runtime
 
         private void Awake()
         {
-            if (Instance == null)
+            if (!Instance && FindObjectsOfType(GetType()).Length == 1)
             {
                 Instance = this;
             }
@@ -37,5 +36,7 @@ namespace SceneLoader.Runtime
             this.sceneData = sceneData;
         }
         #endregion
+        
+        
     }
 }

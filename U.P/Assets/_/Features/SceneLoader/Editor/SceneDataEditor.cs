@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
-using NUnit.Framework;
 using SceneLoader.Data;
 using SceneLoader.Runtime;
 using UnityEditor;
@@ -127,7 +126,7 @@ namespace SceneLoader.Editor
             UnloadSceneData();
             sceneData.LoadScenes();
             _loadedData = sceneData;
-            SceneDataLoader.Instance.SetData(sceneData);
+            //SceneDataState.Instance.SetData(sceneData);
         }
 
         public static void UnloadSceneData()
