@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
-using UnityEditor.Build.Reporting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -10,10 +9,10 @@ namespace _.Features.Symlink.Editor
 {
     public class ToggleFolder : VisualElement
     {
-        public bool IsActive { get; private set; }
         public string Name => name;
         private readonly Toggle _toggle;
         public bool IsToggled => _toggle.value;
+        private ToggleFolderGroup _subfolders;
         public ToggleFolder(string directoryName, string unicodeSymbol = "", string parentPath = null)
         {
             name = parentPath != null ? $@"{parentPath}\{directoryName}" : directoryName;
@@ -28,15 +27,47 @@ namespace _.Features.Symlink.Editor
                     marginRight = 20
                 }
             };
-            _toggle.RegisterCallback<ChangeEvent<bool>>(OnToggle);
+            _toggle.RegisterValueChangedCallback(OnToggle);
             style.flexDirection = FlexDirection.Row;
+            style.backgroundColor = new StyleColor(Color.blue);
             Add(_toggle);
             Add(new Label($"{directoryName}"));
         }
 
+        public void HideToggle()
+        {
+            // make disabled
+            _toggle.style.display = DisplayStyle.None;
+        }
+
+        public void ShowToggle()
+        {
+            _toggle.style.display = DisplayStyle.Flex;
+        }
+
         private void OnToggle(ChangeEvent<bool> evt)
         {
-            IsActive = evt.newValue;
+            if (_subfolders == null) return;
+            var folders = _subfolders.GetFoldersAndSubfolders();
+            if (!evt.newValue)
+            {
+                for (int i = 0; i < folders.Length; i++)
+                {
+                    folders[i].ShowToggle();
+                }
+                return;
+            }
+            for (int i = 0; i < folders.Length; i++)
+            {
+                var subfolder = folders[i];
+                subfolder.SetToggleState(false);
+                subfolder.HideToggle();
+            }
+        }
+
+        public void SetSubfolders(ToggleFolderGroup subfolders)
+        {
+            _subfolders = subfolders;
         }
 
         public void SetToggleState(bool value)
@@ -51,10 +82,11 @@ namespace _.Features.Symlink.Editor
         private readonly List<ToggleFolder> _folders = new();
         private List<ToggleFolderGroup> _subFoldersGroup = new();
         private string parentPath = string.Empty;
-        public ToggleFolderGroup Parent { get; private set; }
         public ToggleFolderGroup(DirectoryInfo parent, ToggleFolderGroup root = null, string parentPath = null)
         {
             style.marginLeft = 15;
+            style.backgroundColor = new StyleColor(Color.red);
+            //if(root == null) Add(new Label($"{parent.Name}"));
             foreach (var directory in parent.GetDirectories())
             {
                 var subFolderPath = parentPath != null ? $@"{parentPath}\{directory.Name}" : directory.Name;
@@ -64,13 +96,13 @@ namespace _.Features.Symlink.Editor
                 Add(directoryElement);
                 _folders.Add(directoryElement);
                 var subDirectoryInfo = new DirectoryInfo(Path.Combine(parent.FullName, directory.Name));
+                if (subDirectoryInfo.GetDirectories().Length <= 0) continue;
                 var subFolderGroup = new ToggleFolderGroup(subDirectoryInfo, this, subFolderPath);
                 Add(subFolderGroup);
                 _subFoldersGroup.Add(subFolderGroup);
-                if (root != null)
-                {
-                    Parent = root;
-                }
+                directoryElement.SetSubfolders(subFolderGroup);
+                // assign subfolders to a togglegroup and make all childrens' toggle hidden and value set to false.
+                // if a toggle folder is toggled on, look at all children folders and disable them.
             }
         }
 
@@ -83,17 +115,19 @@ namespace _.Features.Symlink.Editor
         {
             var allFolders = new List<ToggleFolder>();
             allFolders.AddRange(_folders);
-            foreach (var subFolderGroup in _subFoldersGroup)
+            for (var index = 0; index < _subFoldersGroup.Count; index++)
             {
+                var subFolderGroup = _subFoldersGroup[index];
                 var subFolders = subFolderGroup._folders;
                 allFolders.AddRange(subFolders);
             }
 
-            foreach (var subFolder in allFolders)
+            for (var index = 0; index < allFolders.Count; index++)
             {
-                if (subFolder.name != folderName) continue;
-                return subFolder;
+                if (allFolders[index].name != folderName) continue;
+                return allFolders[index];
             }
+
             return null;
         }
 
@@ -101,11 +135,12 @@ namespace _.Features.Symlink.Editor
         {
             var allFolders = new List<ToggleFolder>();
             allFolders.AddRange(_folders);
-            foreach (var subFolderGroup in _subFoldersGroup)
+            for (var index = 0; index < _subFoldersGroup.Count; index++)
             {
-                var subFolders = subFolderGroup._folders.ToArray();
+                var subFolders = _subFoldersGroup[index]._folders.ToArray();
                 allFolders.AddRange(subFolders);
             }
+
             return allFolders.ToArray();
         }
     }
