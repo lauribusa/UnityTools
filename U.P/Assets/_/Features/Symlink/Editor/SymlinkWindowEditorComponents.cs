@@ -29,7 +29,6 @@ namespace _.Features.Symlink.Editor
             };
             _toggle.RegisterValueChangedCallback(OnToggle);
             style.flexDirection = FlexDirection.Row;
-            style.backgroundColor = new StyleColor(Color.blue);
             Add(_toggle);
             Add(new Label($"{directoryName}"));
         }
@@ -37,12 +36,14 @@ namespace _.Features.Symlink.Editor
         public void HideToggle()
         {
             // make disabled
-            _toggle.style.display = DisplayStyle.None;
+            //_toggle.style.display = DisplayStyle.None;
+            _toggle.style.visibility = Visibility.Hidden;
         }
 
         public void ShowToggle()
         {
-            _toggle.style.display = DisplayStyle.Flex;
+            //_toggle.style.display = DisplayStyle.Flex;
+            _toggle.style.visibility = Visibility.Visible;
         }
 
         private void OnToggle(ChangeEvent<bool> evt)
@@ -54,13 +55,14 @@ namespace _.Features.Symlink.Editor
                 for (int i = 0; i < folders.Length; i++)
                 {
                     folders[i].ShowToggle();
+                    folders[i].SetToggleState(false);
                 }
                 return;
             }
             for (int i = 0; i < folders.Length; i++)
             {
                 var subfolder = folders[i];
-                subfolder.SetToggleState(false);
+                subfolder.SetToggleState(true);
                 subfolder.HideToggle();
             }
         }
@@ -85,8 +87,6 @@ namespace _.Features.Symlink.Editor
         public ToggleFolderGroup(DirectoryInfo parent, ToggleFolderGroup root = null, string parentPath = null)
         {
             style.marginLeft = 15;
-            style.backgroundColor = new StyleColor(Color.red);
-            //if(root == null) Add(new Label($"{parent.Name}"));
             foreach (var directory in parent.GetDirectories())
             {
                 var subFolderPath = parentPath != null ? $@"{parentPath}\{directory.Name}" : directory.Name;
@@ -106,45 +106,23 @@ namespace _.Features.Symlink.Editor
             }
         }
 
-        /// <summary>
-        /// Will return a ToggleFolder from within its elements and sub-elements with the specified name.
-        /// </summary>
-        /// <param name="folderName">The name of the ToggleFolder to find</param>
-        /// <returns>Returns null if none are found.</returns>
-        public ToggleFolder GetFolder(string folderName)
-        {
-            var allFolders = new List<ToggleFolder>();
-            allFolders.AddRange(_folders);
-            for (var index = 0; index < _subFoldersGroup.Count; index++)
-            {
-                var subFolderGroup = _subFoldersGroup[index];
-                var subFolders = subFolderGroup._folders;
-                allFolders.AddRange(subFolders);
-            }
-
-            for (var index = 0; index < allFolders.Count; index++)
-            {
-                if (allFolders[index].name != folderName) continue;
-                return allFolders[index];
-            }
-
-            return null;
-        }
-
         public ToggleFolder[] GetFoldersAndSubfolders()
         {
-            var allFolders = new List<ToggleFolder>();
+            var folders = new List<ToggleFolder>();
+            return GetFoldersAndSubfolders(folders);
+        }
+
+        public ToggleFolder[] GetFoldersAndSubfolders(List<ToggleFolder> allFolders)
+        {
             allFolders.AddRange(_folders);
             for (var index = 0; index < _subFoldersGroup.Count; index++)
             {
-                var subFolders = _subFoldersGroup[index]._folders.ToArray();
-                allFolders.AddRange(subFolders);
+                _subFoldersGroup[index].GetFoldersAndSubfolders(allFolders);
             }
-
             return allFolders.ToArray();
         }
     }
-
+//TODO: Move this to a "common" folder for VisualElements.
     public class ButtonConfirmCancelGroup: VisualElement
     {
         public ButtonConfirmCancelGroup(Action confirmAction, Action cancelAction = null)

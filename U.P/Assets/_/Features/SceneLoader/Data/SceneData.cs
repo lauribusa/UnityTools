@@ -1,11 +1,13 @@
 using System.Collections.Generic;
-using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEditor.SceneManagement;
+#endif
 
 namespace SceneLoader.Data
 {
@@ -36,21 +38,25 @@ namespace SceneLoader.Data
         #region Editor Functions
         public void LoadScenesEditor()
         {
+            #if UNITY_EDITOR
             for (int i = 0; i < sceneAssetReferences.Length; i++)
             {
                 if (!IsSceneValid(sceneAssetReferences[i], out var path)) continue;
                 EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
             }
+            #endif
         }
         
         public void CloseSceneEditor()
         {
+            #if UNITY_EDITOR
             for (int i = 0; i < sceneAssetReferences.Length; i++)
             {
                 if (!IsSceneValid(sceneAssetReferences[i], out var path)) continue;
                 var scene = EditorSceneManager.GetSceneByPath(path);
                 EditorSceneManager.CloseScene(scene, true);
             }
+            #endif
         }
         #endregion
         
@@ -90,12 +96,15 @@ namespace SceneLoader.Data
         #region Private
         private bool IsSceneValid(AssetReference assetReference, out string path)
         {
+            path = "";
+            #if UNITY_EDITOR
             path = AssetDatabase.GUIDToAssetPath(assetReference.AssetGUID);
             for (int i = 0; i < EditorBuildSettings.scenes.Length; i++)
             {
                 if (EditorBuildSettings.scenes[i].path == path) return true;
             }
             Debug.LogError($"ERROR: No valid scene found for path {path}. Perhaps missing from the build settings?");
+            #endif
             return false;
         }    
 

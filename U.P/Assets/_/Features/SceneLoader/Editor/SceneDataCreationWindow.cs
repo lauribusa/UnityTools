@@ -1,12 +1,28 @@
 using System.IO;
 using System.Text.RegularExpressions;
+using _.Features.AddressableTools.Data;
 using SceneLoader.Data;
 using UnityEditor;
+using UnityEditor.AddressableAssets;
+using UnityEditor.AddressableAssets.Settings;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SceneLoader.Editor
 {
+    /*
+     * Créer un scriptableobject qui contiendra le nom des addressable group
+pouvoir modifier la création de level
+créer un script editor qui va les scanner
+faire un diff (modifié par rapport au groupe, si oui je rebuilde)
+
+- create scriptableobject "addressable definition"
+- edit "new level logic" to add into scriptableobject
+- "scan everything" to get all files that need to be changed into addressables
+- make a diff with all groups (and perhaps change the UI to mark it red or green on add, remove, etc)
+- Apply to all groups set as Dirty
+- changer le sceneloader pour accepter des addressables
+     */
     public class SceneDataCreationWindow: EditorWindow
     {
         private bool _isFocused;
@@ -50,13 +66,25 @@ namespace SceneLoader.Editor
         private void CreateNewSceneData(string sceneDataName)
         {
             var sceneData = CreateInstance<SceneData>();
+            var addressableDefinition = CreateInstance<AddressableDefinition>();
             sceneData.name = sceneDataName;
             AssetDatabase.CreateAsset(sceneData, $@"{PATH}\{sceneDataName}.{ASSET}");
-            AssetDatabase.SaveAssets();
+            var sceneDataPath = $@"{PATH}\{sceneDataName}.{ASSET}";
+            AssetDatabase.CreateAsset(addressableDefinition, $@"{PATH}\{sceneDataName}.{nameof(AddressableDefinition)}.{ASSET}");
+            AssetDatabase.SaveAssetIfDirty(sceneData);
+            AssetDatabase.SaveAssetIfDirty(addressableDefinition);
             ShowNotification(new GUIContent("Created Asset."));
             System.Threading.Tasks.Task.Delay(100);
-            AssetDatabase.Refresh();
             EditorGUIUtility.PingObject(sceneData);
+            var settings = AddressableAssetSettingsDefaultObject.Settings;
+            var group = settings.DefaultGroup;
+            var sceneDataReference = settings.CreateOrMoveEntry(AssetDatabase.AssetPathToGUID(sceneDataPath), group, false, false);
+            sceneDataReference.address = sceneDataPath;
+            sceneDataReference.labels.Clear();
+            AssetDatabase.SetLabels(addressableDefinition, new []{"ignore"});
+            group.SetDirty(AddressableAssetSettings.ModificationEvent.EntryMoved, sceneDataReference, false, false);
+            addressableDefinition.AddressableName = sceneDataName;
+            Debug.Log($"{addressableDefinition.AddressableName}");
         }
         
         private static bool FileAlreadyExists(string fileName)

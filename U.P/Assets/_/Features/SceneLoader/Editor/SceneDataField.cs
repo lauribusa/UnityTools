@@ -2,6 +2,8 @@ using Paps.UnityToolbarExtenderUIToolkit;
 using SceneLoader.Data;
 using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UIElements;
 
 namespace SceneLoader.Editor
@@ -9,19 +11,20 @@ namespace SceneLoader.Editor
     [MainToolbarElement("ScenesLoader", order: 1)]
     public class SceneDataField : ObjectField
     {
-        [Serialize] 
-        private SceneData _sceneData;
+        [AssetReferenceUILabelRestriction("sceneData")]
+        private AssetReference assetReference;
         public void InitializeElement()
         {
             label = "Load:";
-            objectType = typeof(SceneData);
-            RegisterCallback<ChangeEvent<Object>>(OnObjectFieldValueChanged);
+            objectType = typeof(AssetReference);
+            RegisterCallback<ChangeEvent<AssetReference>>(OnObjectFieldValueChanged);
         }
-        private void OnObjectFieldValueChanged(ChangeEvent<Object> evt)
+        private void OnObjectFieldValueChanged(ChangeEvent<AssetReference> evt)
         {
-            if (evt.newValue is SceneData sceneData)
+            if (evt.newValue is not null)
             {
-                LoadSceneData(sceneData);
+                var handle = evt.newValue.LoadAssetAsync<SceneData>();
+                handle.Completed += OnLoadingComplete;
             }
             else
             {
@@ -29,14 +32,10 @@ namespace SceneLoader.Editor
             }
         }
 
-        private void LoadSceneData(SceneData sceneData)
+        private void OnLoadingComplete(AsyncOperationHandle<SceneData> handle)
         {
+            var sceneData = handle.Result;
             SceneLoaderEditor.LoadSceneData(sceneData);
-        }
-
-        private void UnloadSceneData()
-        {
-            SceneLoaderEditor.UnloadSceneData();
         }
     }
 }

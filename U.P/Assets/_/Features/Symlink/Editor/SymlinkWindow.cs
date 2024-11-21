@@ -7,10 +7,6 @@ namespace _.Features.Symlink.Editor
 {
     public class SymlinkWindow : EditorWindow
     {
-        #region Public
-
-        #endregion
-
         #region Private & Protected
 
         private static string LinkPath => $@"{Directory.GetCurrentDirectory()}\Assets\_";
@@ -32,7 +28,9 @@ namespace _.Features.Symlink.Editor
         {
             DrawWindow();
         }
-
+        #endregion
+        // TODO: IGNORE ROOT FOLDERS AND ONLY CHECK FOR SUBFOLDERS IN GRAPHICS/AUDIO/LEVELS
+        #region Main
         private void DrawWindow()
         {
             var symlinkDirectory = new DirectoryInfo(OriginPath);
@@ -65,54 +63,38 @@ namespace _.Features.Symlink.Editor
         private void ConfirmSymlinkToggles()
         {
             var folders = _rootFolderGroup.GetFoldersAndSubfolders();
-            foreach (var folder in folders)
+            for (var index = 0; index < folders.Length; index++)
             {
-                var linkPath = $@"{LinkPath}\{folder.Name}";
-                var linkDirectory = new DirectoryInfo(linkPath);
+                var folder = folders[index];
+                var linkDirectory = new DirectoryInfo($@"{LinkPath}\{folder.Name}");
                 if (folder.IsToggled)
                 {
                     if (linkDirectory.Exists)
                     {
-                        if (!DirectoryIsSymlink(linkDirectory))
-                        {
-                            Debug.LogError($"A non-symlink directory already exists at path {linkDirectory.FullName}");
-                        }
+                        if (!DirectoryIsSymlink(linkDirectory)) DeleteDirectory(linkDirectory.FullName);
                         continue;
                     }
                     CreateSymlinkDirectory(folder.Name);
+                    continue;
                 }
-                else
-                {
-                    if (!linkDirectory.Exists)
-                    {
-                        continue;
-                    }
-                    if (!DirectoryIsSymlink(linkDirectory))
-                    {
-                        Debug.LogError($"Directory exists but is not symlink: {linkDirectory.FullName}");
-                        continue;
-                    }
-                    DeleteSymlinkDirectory(folder.Name);
-                }
+    
+                if (!linkDirectory.Exists) continue;
+                if (!DirectoryIsSymlink(linkDirectory)) continue;
+
+                DeleteDirectory(linkDirectory.FullName);
             }
         }
 
         private void CheckForExistingSymlinks()
         {
             var folders = _rootFolderGroup.GetFoldersAndSubfolders();
-            foreach (var folder in folders)
+            for (var index = 0; index < folders.Length; index++)
             {
+                var folder = folders[index];
                 var targetDirectory = new DirectoryInfo($@"{LinkPath}\{folder.Name}");
                 var isValidSymlink = targetDirectory.Exists && DirectoryIsSymlink(targetDirectory);
                 if (!isValidSymlink) continue;
-                var foundFolder = _rootFolderGroup.GetFolder(folder.Name);
-                if (foundFolder == null)
-                {
-                    Debug.LogError($"Couldn't find Symlink Folder with name: {folder.Name} in FolderGroup.");
-                    continue;
-                }
-
-                foundFolder.SetToggleState(true);
+                folder.SetToggleState(true);
             }
         }
 
@@ -127,100 +109,106 @@ namespace _.Features.Symlink.Editor
             return directoryInfo.Attributes.HasFlag(FileAttributes.ReparsePoint);
         }
 
-        private void DeleteSymlinkDirectory(string path)
+        private void DeleteDirectory(string path)
         {
-            var linkPath = $@"{LinkPath}\{path}";
-            var linkDirectory = new DirectoryInfo(linkPath);
-            Debug.Log($"to delete: {linkDirectory.FullName}");
-            Directory.Delete(linkPath);
+            Directory.Delete(path);
+            File.Delete($"{path}.meta");
+            AssetDatabase.Refresh();
         }
         private void CreateSymlinkDirectory(string path)
         {
-            var linkPath = $@"{LinkPath}\{path}";
             var originPath = $@"{OriginPath}\{path}";
-            var linkDirectory = new DirectoryInfo(linkPath);
             var originDirectory = new DirectoryInfo(originPath);
-            var subFolders = path.Split('\\');
+            
+            var targetPath = $@"{LinkPath}\{path}";
+            var targetDirectory = new DirectoryInfo(targetPath);
+            
+            Directory.CreateDirectory(Directory.GetParent(targetDirectory.FullName).FullName);
+            
+            var subFolderPaths = path.Split('\\');
             var nestedPath = "";
-            for (int i = 0; i < subFolders.Length - 1; i++)
+            for (int i = 0; i < subFolderPaths.Length - 1; i++)
             {
-                var subFolder = subFolders[i];
+                var subFolder = subFolderPaths[i];
                 nestedPath += $@"\{subFolder}";
-                var nestedDirectory = new DirectoryInfo(linkPath);
+                var nestedDirectory = new DirectoryInfo($@"{LinkPath}{nestedPath}");
                 if (nestedDirectory.Exists) continue;
                 Directory.CreateDirectory($"{LinkPath}{nestedPath}");
             }
-            if (linkDirectory.Exists)
+            if (targetDirectory.Exists)
             {
-                if (DirectoryIsSymlink(linkDirectory))
+                if (DirectoryIsSymlink(targetDirectory))
                 {
-                    Debug.LogWarning($"Symlink directory already exists: {linkDirectory.FullName}");
+                    Debug.LogWarning($"Symlink directory already exists: {targetDirectory.FullName}");
                     return;
                 }
 
-                Debug.LogError($"A non-symlink directory already exists at path {linkDirectory.FullName}");
+                Debug.LogError($"A non-symlink directory already exists at path {targetDirectory.FullName}");
                 return;
             }
 
             if (!originDirectory.Exists)
             {
-                EditorUtility.DisplayDialog("Error",
-                    $"Could not find a valid directory at path {originDirectory.FullName}", "OK");
+                Debug.LogError($"Could not found directory at path {originDirectory.FullName}");
                 return;
             }
-            var success = MakeSymlinkFromPowerShell(linkPath, originPath);
+            var success = MakeSymlinkFromPowerShell(targetPath, originPath);
 
             Debug.Log(success
-                ? $"Created Symlink Directory at {linkPath} from {originPath}"
-                : $"Failed to create Symlink Directory at {linkPath} from {originPath}.");
+                ? $"Created Symlink Directory at {targetPath} from {originPath}"
+                : $"Failed to create Symlink Directory at {targetPath} from {originPath}.");
         }
         
         private bool MakeSymlinkFromCommandLine(string linkPath, string originPath)
         {
             var args = $"/c mklink /J {linkPath} {originPath}";
-            return RunProcess(args, "cmd");
-        }
-
-        private bool MakeSymlinkFromPowerShell(string linkPath, string originPath)
-        {
-            var args = $"New-Item -Path {linkPath} -ItemType Junction -Value {originPath}";
-            return RunProcess(args, "powershell");
-        }
-
-        private static bool RunProcess(string args, string processName)
-        {
             var process = new System.Diagnostics.Process
             {
                 StartInfo = new System.Diagnostics.ProcessStartInfo
                 {
                     WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
-                    FileName = $"{processName}.exe",
+                    FileName = $"cmd.exe",
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
                     Arguments = args
                 }
             };
+            return RunProcess(process);
+        }
+
+        private bool MakeSymlinkFromPowerShell(string linkPath, string originPath)
+        {
+            var args = $"New-Item -Path {linkPath} -ItemType Junction -Value {originPath}";
+            var process = new System.Diagnostics.Process
+            {
+                StartInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
+                    FileName = $"powershell.exe",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    Arguments = args
+                }
+            };
+            return RunProcess(process);
+        }
+
+        private static bool RunProcess(System.Diagnostics.Process process)
+        {
             process.Start();
             var stdout = process.StandardOutput.ReadToEnd();
             var stderr = process.StandardError.ReadToEnd();
-            if(stdout.Length > 0)Debug.Log($"{stdout} || END.");
-            if(stderr.Length > 0)Debug.LogError($"{stderr} || END.");
+            if(stdout.Length > 0)Debug.Log($"STDOUT: {stdout}");
+            if(stderr.Length > 0)Debug.LogError($"STDERR: {stderr}");
             process.WaitForExit();
-            return process.ExitCode == 0;
-        }
-
-        private void PrintAllSymlinkDir(DirectoryInfo directoryInfo)
-        {
-            if (DirectoryIsSymlink(directoryInfo))
-            {
-                Debug.Log($"Is Symlink: {directoryInfo.FullName}");
-            }
-
-            foreach (var dir in directoryInfo.GetDirectories())
-            {
-                PrintAllSymlinkDir(dir);
-            }
+            var exitCode = process.ExitCode;
+            Debug.unityLogger.logEnabled = false;
+            AssetDatabase.Refresh();
+            Debug.unityLogger.logEnabled = true;
+            process.Dispose();
+            return exitCode == 0;
         }
         #endregion
     }
