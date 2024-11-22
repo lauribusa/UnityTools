@@ -53,6 +53,8 @@ namespace SceneLoader.Editor
                 var assetPath = $"{path}/{sceneDataName}.{ASSET}";
                 
                 var group = settings.FindGroup(sceneDataName) ?? settings.CreateGroup(sceneDataName, false, false, true, null);
+                
+                //TODO: don't just scan for scenes but instead look for AddressableDefinition and set ALL items within folder as addressable, while ignoring those set as "ignore".
                 var allScenes = AssetDatabase.FindAssets("t:scene", new[] { scenesPath });
                 var sceneAssetReferences = SetScenesAsAddressable(allScenes, group);
                 
@@ -62,10 +64,6 @@ namespace SceneLoader.Editor
             }
         }
 
-        private static void FindAllAssetReferences(AddressableAssetGroup group)
-        {
-            group.GetAssetEntry("");
-        }
         private static AssetReference[] SetScenesAsAddressable(string[] sceneGuids, AddressableAssetGroup group)
         {
             var sceneAssetReferences = new AssetReference[sceneGuids.Length];
@@ -78,7 +76,6 @@ namespace SceneLoader.Editor
                     sceneAssetReferences[i] = sceneAssetReference;
                     continue;
                 }
-                //TODO: skip if reference exists
 ;               var scenePath = AssetDatabase.GUIDToAssetPath(sceneGuids[i]);
                 var addressableAssetEntry = SetAsAddressable(scenePath, group);
                 addressableAssetEntry.labels.Add("scene");

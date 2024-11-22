@@ -1,4 +1,5 @@
 using Paps.UnityToolbarExtenderUIToolkit;
+using UnityEditor;
 using UnityEngine.UIElements;
 
 namespace SceneLoader.Editor
@@ -17,8 +18,8 @@ namespace SceneLoader.Editor
 
         private void OnChange(ChangeEvent<bool> evt)
         {
-            
             _overrideRuntime = evt.newValue;
+            SessionState.SetBool("RuntimeOverride", _overrideRuntime);
         }
     }
 }

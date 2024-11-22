@@ -1,48 +1,42 @@
-using Paps.UnityToolbarExtenderUIToolkit;
 using SceneLoader.Data;
-using SceneLoader.Editor;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace SceneLoader.Runtime
 {
     public class SceneDataState : MonoBehaviour
     {
         #region Private & Protected
-        public static SceneDataState Instance { get; private set; }
         [SerializeField]
-        private SceneData sceneData;
+        private AssetReferenceSceneData sceneData;
         #endregion
 
         #region Unity API
 
         private void Awake()
         {
-            if (!Instance && FindObjectsOfType(GetType()).Length == 1)
+            var runtimeOverride = SessionState.GetBool("RuntimeOverride", false);
+            var assetRef = sceneData;
+            if (runtimeOverride)
             {
-                Instance = this;
+                var sceneDataPath = SessionState.GetString("SceneDataPath", string.Empty);
+                var guid = AssetDatabase.AssetPathToGUID(sceneDataPath);
+                var assetReference = new AssetReferenceSceneData(guid);
+                assetRef = assetReference;
             }
-            else
-            {
-                DestroyImmediate(this);
-            }
-            //if()
-            if(sceneData == null)
+            if(assetRef == null)
             {
                 throw new System.Exception($"No scene set loaded in scene loader.");
             }
-            sceneData!.LoadScenes();
+            var handler = Addressables.LoadAssetAsync<SceneData>(assetRef);
+            handler.Completed += LoadSceneData;
         }
 
-        private void GetSceneDataFromToolbarField()
+        private void LoadSceneData(AsyncOperationHandle<SceneData> handler)
         {
-            var runtimeOverride = MainToolbar.UnityToolbarRoot
-                .GetFirstOfType<SceneDataLoaderRuntimeOverride>();
-            var field = MainToolbar.UnityToolbarRoot.GetFirstOfType<SceneDataField>();
-        }
-
-        public void SetData(SceneData sceneData)
-        {
-            this.sceneData = sceneData;
+            handler.Result.LoadScenes();
         }
         #endregion
         

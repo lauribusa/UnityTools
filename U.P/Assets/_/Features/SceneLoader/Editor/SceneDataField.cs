@@ -1,5 +1,6 @@
 using Paps.UnityToolbarExtenderUIToolkit;
 using SceneLoader.Data;
+using UnityEditor;
 using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -20,15 +21,16 @@ namespace SceneLoader.Editor
         public void InitializeElement()
         {
             label = "Load:";
-            objectType = typeof(AssetReference);
-            RegisterCallback<ChangeEvent<AssetReference>>(OnObjectFieldValueChanged);
+            objectType = typeof(SceneData);
+            RegisterCallback<ChangeEvent<SceneData>>(OnObjectFieldValueChanged);
         }
-        private void OnObjectFieldValueChanged(ChangeEvent<AssetReference> evt)
+        private void OnObjectFieldValueChanged(ChangeEvent<SceneData> evt)
         {
             if (evt.newValue is not null)
             {
-                var handle = evt.newValue.LoadAssetAsync<SceneData>();
-                handle.Completed += OnLoadingComplete;
+                var sceneData = evt.newValue;
+                var path = AssetDatabase.GetAssetPath(sceneData);
+                SessionState.SetString("SceneDataPath", path);
             }
             else
             {
