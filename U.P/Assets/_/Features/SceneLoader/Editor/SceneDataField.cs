@@ -1,5 +1,6 @@
 using Paps.UnityToolbarExtenderUIToolkit;
 using SceneLoader.Data;
+using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -13,6 +14,9 @@ namespace SceneLoader.Editor
     {
         [AssetReferenceUILabelRestriction("sceneData")]
         private AssetReference assetReference;
+
+        [Serialize]
+        public SceneData SceneData;
         public void InitializeElement()
         {
             label = "Load:";
@@ -36,6 +40,7 @@ namespace SceneLoader.Editor
         {
             var sceneData = handle.Result;
             SceneLoaderEditor.LoadSceneData(sceneData);
+            SceneData = sceneData;
         }
     }
 }

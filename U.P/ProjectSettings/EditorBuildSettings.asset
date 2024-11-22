@@ -6,10 +6,10 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/_/Levels/Persistent-engine/Persistent-Engine.unity
+    path: Assets/_/Levels/Persistent-engine/scenes/Persistent-Engine.unity
     guid: 96c7ea5033b054a4eb573a70236c9a83
   - enabled: 1
-    path: Assets/_/Levels/Persistent-game/Persistent-Game.unity
+    path: Assets/_/Levels/Persistent-game/scenes/Persistent-Game.unity
     guid: e1923b483e250ae4d91f04a6b133db17
   - enabled: 1
     path: Assets/_/Levels/Game.unity

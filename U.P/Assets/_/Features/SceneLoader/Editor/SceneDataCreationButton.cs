@@ -9,7 +9,7 @@ namespace SceneLoader.Editor
     {
         public void InitializeElement()
         { 
-           text = "ScenesCreator";
+           text = "Create SceneData";
            clicked += OnClick;
            style.display = DisplayStyle;
            ToolEvent.OnChanged += OnToolbarTypeChanged;

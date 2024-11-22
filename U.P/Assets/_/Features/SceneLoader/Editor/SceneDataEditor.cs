@@ -2,8 +2,9 @@
 using System.IO;
 using System.Text.RegularExpressions;
 using SceneLoader.Data;
-using SceneLoader.Runtime;
 using UnityEditor;
+using UnityEditor.AddressableAssets;
+using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.SceneManagement;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -34,7 +35,6 @@ namespace SceneLoader.Editor
 
         public override VisualElement CreateInspectorGUI()
         {
-
             var root = new VisualElement();
             InspectorElement.FillDefaultInspector(root, serializedObject, this);
             var buttonGroup = new VisualElement
@@ -71,17 +71,18 @@ namespace SceneLoader.Editor
 
         private void OnCreateSceneEvent()
         {
-            if (FileAlreadyExists(_sceneName))
-            {
-                EditorUtility.DisplayDialog("Error", $@"A file at path {PATH}\{_sceneName}.{UNITY}\ already exists.", "OK");
-                return;
-            }
-
             if (!IsValidFilename(_sceneName) || string.IsNullOrWhiteSpace(_sceneName))
             {
                 EditorUtility.DisplayDialog("Error", $"The name is empty or contains invalid characters.", "OK");
                 return;
             }
+            
+            if (FileAlreadyExists(_sceneName))
+            {
+                EditorUtility.DisplayDialog("Error", $@"A file at path {PATH}\{_sceneName}.{UNITY}\ already exists.", "OK");
+                return;
+            }
+            
             if (EditorUtility.DisplayDialog("Create Scene", $"Do you wish to create the scene {_sceneName}?", "OK",
                     "Cancel"))
             {
@@ -94,14 +95,28 @@ namespace SceneLoader.Editor
             var sceneData = serializedObject.targetObject as SceneData;
             if (sceneData == null) return;
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
-            var composedPath = $@"{PATH}\{sceneData.name}_{sceneName}.{UNITY}";
+            var composedPath = $@"{PATH}/{sceneData.name}/scenes/{sceneData.name}_{sceneName}.{UNITY}";
             EditorSceneManager.SaveScene(scene, composedPath);
             EditorSceneManager.CloseScene(scene, true);
             var sceneGuid = AssetDatabase.AssetPathToGUID(composedPath);
+            var settings = AddressableAssetSettingsDefaultObject.Settings;
+            var foundGroup = settings.groups.Find(g => g.Name == sceneData.name);
+            var addressableAssetEntry = SetAsAddressable(composedPath, foundGroup);
+            addressableAssetEntry.labels.Add("scene");
             var assetReference = new AssetReference(sceneGuid);
             List<AssetReference> referenceList = new(sceneData.sceneAssetReferences) { assetReference };
             sceneData.sceneAssetReferences = referenceList.ToArray();
             _sceneName = string.Empty;
+        }
+        
+        private static AddressableAssetEntry SetAsAddressable(string path, AddressableAssetGroup group, bool clearLabels = false)
+        {
+            var settings = AddressableAssetSettingsDefaultObject.Settings;
+            var addressableAssetEntry = settings.CreateOrMoveEntry(AssetDatabase.AssetPathToGUID(path), group, false, false);
+            addressableAssetEntry.address = path;
+            if(clearLabels) addressableAssetEntry.labels.Clear();
+            group.SetDirty(AddressableAssetSettings.ModificationEvent.EntryMoved, addressableAssetEntry, false);
+            return addressableAssetEntry;
         }
 
         private void DeleteScene()

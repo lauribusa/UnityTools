@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -15,7 +14,7 @@ namespace SceneLoader.Data
     public class SceneData : ScriptableObject
     {
         #region Variables
-        [FormerlySerializedAs("scenes")] public AssetReference[] sceneAssetReferences;
+        public AssetReference[] sceneAssetReferences;
         private List<SceneInstance> _instances = new();
         #endregion
 

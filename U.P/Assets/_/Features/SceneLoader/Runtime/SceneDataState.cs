@@ -1,4 +1,6 @@
+using Paps.UnityToolbarExtenderUIToolkit;
 using SceneLoader.Data;
+using SceneLoader.Editor;
 using UnityEngine;
 
 namespace SceneLoader.Runtime
@@ -23,12 +25,19 @@ namespace SceneLoader.Runtime
             {
                 DestroyImmediate(this);
             }
-            
+            //if()
             if(sceneData == null)
             {
                 throw new System.Exception($"No scene set loaded in scene loader.");
             }
             sceneData!.LoadScenes();
+        }
+
+        private void GetSceneDataFromToolbarField()
+        {
+            var runtimeOverride = MainToolbar.UnityToolbarRoot
+                .GetFirstOfType<SceneDataLoaderRuntimeOverride>();
+            var field = MainToolbar.UnityToolbarRoot.GetFirstOfType<SceneDataField>();
         }
 
         public void SetData(SceneData sceneData)

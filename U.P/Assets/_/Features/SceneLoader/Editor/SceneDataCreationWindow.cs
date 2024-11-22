@@ -58,7 +58,7 @@ faire un diff (modifié par rapport au groupe, si oui je rebuilde)
 
         public void OnGUI()
         {
-            if (_isFocused) return;
+            if (_isFocused || _sceneDataName == null) return;
             _isFocused = true;
             _sceneDataName.Focus();
         }
@@ -68,29 +68,45 @@ faire un diff (modifié par rapport au groupe, si oui je rebuilde)
             var sceneData = CreateInstance<SceneData>();
             var addressableDefinition = CreateInstance<AddressableDefinition>();
             sceneData.name = sceneDataName;
-            AssetDatabase.CreateAsset(sceneData, $@"{PATH}\{sceneDataName}.{ASSET}");
-            var sceneDataPath = $@"{PATH}\{sceneDataName}.{ASSET}";
-            AssetDatabase.CreateAsset(addressableDefinition, $@"{PATH}\{sceneDataName}.{nameof(AddressableDefinition)}.{ASSET}");
+            var filePath = $@"{PATH}\{sceneDataName}\{sceneDataName}";
+            var sceneDataPath = $"{filePath}.{ASSET}";
+            var sceneFolderPath = $@"{PATH}\{sceneDataName}\scenes";
+            Directory.CreateDirectory(sceneFolderPath);
+            AssetDatabase.CreateAsset(sceneData, sceneDataPath);
+            AssetDatabase.CreateAsset(addressableDefinition, $@"{filePath}.{nameof(AddressableDefinition)}.{ASSET}");
             AssetDatabase.SaveAssetIfDirty(sceneData);
             AssetDatabase.SaveAssetIfDirty(addressableDefinition);
+            AssetDatabase.ImportAsset(sceneFolderPath);
             ShowNotification(new GUIContent("Created Asset."));
             System.Threading.Tasks.Task.Delay(100);
             EditorGUIUtility.PingObject(sceneData);
             var settings = AddressableAssetSettingsDefaultObject.Settings;
-            var group = settings.DefaultGroup;
-            var sceneDataReference = settings.CreateOrMoveEntry(AssetDatabase.AssetPathToGUID(sceneDataPath), group, false, false);
-            sceneDataReference.address = sceneDataPath;
-            sceneDataReference.labels.Clear();
+            var group = settings.FindGroup(sceneDataName) ?? settings.CreateGroup(sceneDataName, false, false, true, null);
+            SetAsAddressable(sceneDataPath, group, true);
             AssetDatabase.SetLabels(addressableDefinition, new []{"ignore"});
-            group.SetDirty(AddressableAssetSettings.ModificationEvent.EntryMoved, sceneDataReference, false, false);
             addressableDefinition.AddressableName = sceneDataName;
-            Debug.Log($"{addressableDefinition.AddressableName}");
+        }
+
+        public static void SetAsAddressable(string path, bool clearLabels = false)
+        {
+            SetAsAddressable(path, AddressableAssetSettingsDefaultObject.Settings.DefaultGroup, clearLabels);
+        }
+
+        public static void SetAsAddressable(string path, AddressableAssetGroup group, bool clearLabels = false)
+        {
+            var settings = AddressableAssetSettingsDefaultObject.Settings;
+            settings.CreateOrMoveEntry(AssetDatabase.AssetPathToGUID(path), group, false, false);
+            var addressableAssetEntry = settings.CreateOrMoveEntry(AssetDatabase.AssetPathToGUID(path), group, false, false);
+            addressableAssetEntry.address = path;
+            if(clearLabels) addressableAssetEntry.labels.Clear();
+            group.SetDirty(AddressableAssetSettings.ModificationEvent.EntryMoved, addressableAssetEntry, false);
         }
         
         private static bool FileAlreadyExists(string fileName)
         {
-            if (!File.Exists($@"{PATH}\{fileName}.{ASSET}")) return false;
-            EditorUtility.DisplayDialog("Error", $@"File at path {PATH}\{fileName}.{ASSET} already exists.", "OK");
+            var filePath = $@"{PATH}\{fileName}\{fileName}.{ASSET}";
+            if (!File.Exists(filePath)) return false;
+            EditorUtility.DisplayDialog("Error", $@"File at path {filePath} already exists.", "OK");
             return true;
         }
 
@@ -100,7 +116,7 @@ faire un diff (modifié par rapport au groupe, si oui je rebuilde)
             return !containsABadCharacter.IsMatch(testName);
         }
 
-        private const string PATH = @"Assets\_\Features\SceneLoader\Data";
+        private const string PATH = @"Assets\_\Levels";
         private const string ASSET = "asset";
     }
 }

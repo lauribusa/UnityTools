@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Persistent-game
+  m_EditorClassIdentifier: 
+  m_GroupName: Persistent-game
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 68d4d7d3ecedeb9498cf12ec19b01e25
+  m_SerializeEntries:
+  - m_GUID: 79fda8642786906439d54ab9f17cd6af
+    m_Address: Assets\_\Levels\Persistent-game\scenes\Persistent-game_test.unity
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - scene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 91e8dd2f7df63ce4381c30208964b3ec
+    m_Address: Assets\_\Levels\Persistent-game\Persistent-game.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e1923b483e250ae4d91f04a6b133db17
+    m_Address: Assets/_/Levels/Persistent-game/scenes/Persistent-Game.unity
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - scene
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 1afc60e795d3a56498578fa71d11f3dc, type: 2}
+  m_SchemaSet:
+    m_Schemas: []

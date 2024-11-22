@@ -7,7 +7,7 @@ namespace SceneLoader.Editor
     public class SceneDataLoaderRuntimeOverride: Toggle
     {
         [Serialize]
-        private bool _overrideRuntime;
+        public bool _overrideRuntime;
         public void InitializeElement()
         {
             value = _overrideRuntime;
@@ -17,6 +17,7 @@ namespace SceneLoader.Editor
 
         private void OnChange(ChangeEvent<bool> evt)
         {
+            
             _overrideRuntime = evt.newValue;
         }
     }
