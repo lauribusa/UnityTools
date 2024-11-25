@@ -6,52 +6,46 @@ namespace GBehavior
 {
     public static class PoolManager
     {
-        private static List<Pool<IPoolable>> _pools = new();
-
-        public static Pool<T> GetPool<T>() where T: IPoolable
+        private static readonly Dictionary<Type, Pool<IPoolable>> _pools = new();
+        public static Pool<T> GetPool<T>() where T : IPoolable
         {
-            for (int i = 0; i < _pools.Count; i++)
+            if (_pools.ContainsKey(typeof(T)))
             {
-                if (_pools[i].DataType == typeof(T))
-                {
-                    return _pools[i] as Pool<T>;
-                }
+                return _pools[typeof(T)] as Pool<T>;
             }
             return null;
         }
-        
-        public static Pool<T> CreatePool<T>(int size) where T: IPoolable
-        {
-            for (int i = 0; i < _pools.Count; i++)
-            {
-                var pool = _pools[i];
-                if (pool.DataType != typeof(T)) continue;
-                pool.RefreshPoolSize(size);
-                return pool as Pool<T>;
-            }
 
+        public static Pool<T> CreatePool<T>(int size) where T : IPoolable
+        {
+            if (_pools.ContainsKey(typeof(T)))
+            {
+                if (_pools[typeof(T)].Size >= size) return _pools[typeof(T)] as Pool<T>;
+                _pools[typeof(T)].RefreshPoolSize(size);
+                return _pools[typeof(T)] as Pool<T>;
+            }
             var newPool = new Pool<T>(size);
-            _pools.Add(newPool as Pool<IPoolable>);
+            _pools.Add(typeof(T), newPool as Pool<IPoolable>);
             return newPool;
         }
     }
 
     public interface IPoolable
     {
-        public int Id { get; }
+        public int Id { get; set; }
         public bool InUse { get; set; }
     }
-    public class Pool<T> where T: IPoolable
+
+    public class Pool<T> where T : IPoolable
     {
         public int Size => Elements.Length;
         public T[] Elements { get; set; }
-        public Type DataType { get; }
+
         public Pool(int size)
         {
             Elements = new T[size];
-            DataType = typeof(T);
         }
-        
+
         public void RefreshPoolSize(int size)
         {
             if (size <= Elements.Length) return;
@@ -60,14 +54,17 @@ namespace GBehavior
             elements.CopyTo(Elements, 0);
         }
 
-        public void Initialize(T element)
+        public void Place(T element)
         {
             for (int i = 0; i < Elements.Length; i++)
             {
-                var copy = element;
+                if (Elements[i] is not null) continue;
+                Elements[i] = element;
+                Elements[i].Id = i;
+                return;
             }
         }
-        
+
         public T Take()
         {
             var free = FindFreeElement();
@@ -80,12 +77,19 @@ namespace GBehavior
             free.InUse = true;
             return free;
         }
-        
+
         public void Free(int index)
         {
             if (index <= 0 || index >= Elements.Length) return;
             Elements[index].InUse = false;
         }
+
+        public void Free(T element)
+        {
+            if (element == null) return;
+            Free(element.Id);
+        }
+
         private T FindFreeElement()
         {
             for (int i = 0; i < Elements.Length; i++)
