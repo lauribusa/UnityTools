@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.github-glitchenzo.nugetforunity": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity",
     "com.paps.unity-toolbar-extender-ui-toolkit": "file:../unity_toolbar_ui_toolkit/Package",
     "com.unity.addressables": "1.22.3",
     "com.unity.collab-proxy": "2.5.2",

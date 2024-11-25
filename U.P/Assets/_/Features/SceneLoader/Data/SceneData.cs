@@ -14,6 +14,7 @@ namespace SceneLoader.Data
     public class SceneData : ScriptableObject
     {
         #region Variables
+        
         public AssetReference[] sceneAssetReferences;
         private List<SceneInstance> _instances = new();
         #endregion
