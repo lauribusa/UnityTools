@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26556f9723d512a4c9c1e1518315890a, type: 3}
   m_Name: Persistent-engine
   m_EditorClassIdentifier: 
-  sceneAssetReferences: []
+  sceneAssetReferences:
+  - m_AssetGUID: 96c7ea5033b054a4eb573a70236c9a83
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0

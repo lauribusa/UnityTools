@@ -18,13 +18,18 @@ MonoBehaviour:
   m_GUID: 68d4d7d3ecedeb9498cf12ec19b01e25
   m_SerializeEntries:
   - m_GUID: 79fda8642786906439d54ab9f17cd6af
-    m_Address: Assets\_\Levels\Persistent-game\scenes\Persistent-game_test.unity
+    m_Address: Assets/_/Levels/Persistent-game/scenes/Persistent-game_test.unity
     m_ReadOnly: 0
     m_SerializedLabels:
     - scene
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 91e8dd2f7df63ce4381c30208964b3ec
-    m_Address: Assets\_\Levels\Persistent-game\Persistent-game.asset
+    m_Address: Assets/_/Levels/Persistent-game/Persistent-game.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a1f7ea130e59a4b4bada509989894ab9
+    m_Address: Assets/_/Levels/Persistent-game/scenes
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

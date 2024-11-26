@@ -12,4 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26556f9723d512a4c9c1e1518315890a, type: 3}
   m_Name: MainMenu
   m_EditorClassIdentifier: 
-  sceneAssetReferences: []
+  sceneAssetReferences:
+  - m_AssetGUID: 63e789019e2b0ef41818a609454c002e
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: 5eb3789fab549054c88abeadef2dfb2c
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: 13bce9533ae925348a4d861fa361826d
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0

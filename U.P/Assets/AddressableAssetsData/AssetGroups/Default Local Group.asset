@@ -16,36 +16,7 @@ MonoBehaviour:
   m_Data:
     m_SerializedData: []
   m_GUID: 86600cb438706c043b730261e3dc03c7
-  m_SerializeEntries:
-  - m_GUID: 19569cc38f4200f479b6c0c56fa78e10
-    m_Address: Assets/_/Levels/Light.unity
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - scene
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 39d383761c4ccd047966d1e37a3f10b2
-    m_Address: Assets/_/Levels/UI.unity
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - scene
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 4c27afc788aa11e4ab5b92a07a37e48f
-    m_Address: Assets\_\Features\SceneLoader\Data\DefaultData.asset
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 8851911ce11046043b16cb547335e94d
-    m_Address: Assets/_/Levels/Game.unity
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - scene
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 910e47d0cdaa6b14abc87bba498e7f25
-    m_Address: Assets/_/Features/SceneLoader/Data/SceneLoader.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - scene
-    FlaggedDuringContentUpdateRestriction: 0
+  m_SerializeEntries: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 1afc60e795d3a56498578fa71d11f3dc, type: 2}
   m_SchemaSet:

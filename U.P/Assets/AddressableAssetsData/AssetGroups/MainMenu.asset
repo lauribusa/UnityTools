@@ -17,11 +17,123 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: 27f17eb19e166b64984af69b62674665
   m_SerializeEntries:
+  - m_GUID: 0b31d3044889e7448a19e42f3fd9b1b9
+    m_Address: Assets/_/Features/SceneLoader/Editor/SceneDataEditor.cs
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 13bce9533ae925348a4d861fa361826d
     m_Address: Assets/_/Levels/MainMenu/scenes/Two.unity
     m_ReadOnly: 0
     m_SerializedLabels:
     - scene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 19569cc38f4200f479b6c0c56fa78e10
+    m_Address: Assets/_/Levels/Light.unity
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - scene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 25f19b4134ca46d0adcdb2012f66c9e4
+    m_Address: Assets/_/Features/SceneLoader/Editor/SceneDataCreationWindow.cs
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 26556f9723d512a4c9c1e1518315890a
+    m_Address: Assets/_/Features/SceneLoader/Data/SceneData.cs
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2a215d9b89d99f24692a94ff90a06f36
+    m_Address: Assets/_/Features/SceneLoader/Runtime
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 30eb57b5dd123a041a129b53e6c2e950
+    m_Address: Assets/_/Features/Symlink
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 316e9e63c8684a3449e33a5027d75bd9
+    m_Address: Assets/_/Config
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 328e489e7bc44a7ab8ec4583bc80a226
+    m_Address: Assets/_/Features/SceneLoader/Editor/SceneCreationWindow.cs
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 33ab1a7455c30db45bc70cd52bd26f3d
+    m_Address: Assets/_/Features/FeatureFactory/Editor/FeatureFactoryButton.cs
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 33bd44c6e3c24baf96cbd9792686b548
+    m_Address: Assets/_/Features/FeatureFactory/Editor/FeatureFactoryEditor.cs
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3628f43a0e202e144954170978399a4b
+    m_Address: Assets/_/Features/Toolbar
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 369218866f922e24b9aaff96deb0d540
+    m_Address: Assets/_/Features/Symlink/Editor
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 377c1232137859d4b8b28ef3683440d1
+    m_Address: Assets/_/Features/Symlink/Data/Symlink.Data.asmdef
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 39d383761c4ccd047966d1e37a3f10b2
+    m_Address: Assets/_/Levels/UI.unity
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - scene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3e557558d9104d439bdd3d8add0b4d0f
+    m_Address: Assets/_/Features/SceneLoader/Editor/SceneDataCreationButton.cs
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4123876310528a8449ad7dba13593886
+    m_Address: Assets/_/Features/Symlink/Data
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 469eff8e214f4e24a3e5579e109d7d8b
+    m_Address: Assets/_/Features/Symlink/Editor/SymlinkWindow.cs
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4dce9ecd4b306fc47bc5df3caf12f2bf
+    m_Address: Assets/_/Features/SceneLoader/Data/SceneLoader.Data.asmdef
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 50e18efb49f020f4392f16c5f9bf42db
+    m_Address: Assets/AddressableAssetsData
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5243258b168e5d44f9bce0a6a1cb6bdc
+    m_Address: Assets/_/Features/AddressableTools/Editor
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 54987615675e40d1b33e696f890bf1ee
+    m_Address: Assets/_/Features/AddressableTools/Editor/AddressableDefinitionEditor.cs
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5ead32b22aaf048409e24219210e3da3
+    m_Address: Assets/_/Features/SceneLoader/Runtime/SceneLoader.Runtime.asmdef
+    m_ReadOnly: 1
+    m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5eb3789fab549054c88abeadef2dfb2c
     m_Address: Assets/_/Levels/MainMenu/scenes/Three.unity
@@ -29,14 +141,201 @@ MonoBehaviour:
     m_SerializedLabels:
     - scene
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5fbc638c0acd6c6478e29b6c80e6e960
+    m_Address: Assets/_/Features/AddressableTools/Data/AddressableTools.Data.asmdef
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 62e19f54fa26423396eb772f1acc9e4e
+    m_Address: Assets/_/Features/AddressableTools/Data
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 63e789019e2b0ef41818a609454c002e
     m_Address: Assets/_/Levels/MainMenu/scenes/One.unity
     m_ReadOnly: 0
     m_SerializedLabels:
     - scene
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6627382eb2d775b4091340f505c48b71
+    m_Address: Assets/_/Features/FeatureFactory
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6e3e22d8ea8032a43bc237fcb53e4967
+    m_Address: Assets/_/Features/SceneLoader/Editor
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 790d91a1f92f4686bf42c9086eac7b9e
+    m_Address: Assets/_/Features/AddressableTools/Data/AddressableDefinition.cs
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7d057e1504ef868408cabfbb880803f1
+    m_Address: Assets/_/Features/AddressableTools
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 809598ca9f3c4a0ca420a696a9a65e4c
+    m_Address: Assets/_/Features/SceneLoader/Editor/SceneDataWatchdog.cs
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 831de28809604a64e82a03854d7f204f
+    m_Address: Assets/_/Levels/Persistent-engine
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 86ec1e02f051b924a9c32988af179874
+    m_Address: Assets/_/Audio
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 875e9d1a6c6b8b24faa4c549796f6ab7
+    m_Address: Assets/_/Features/FeatureFactory/Editor
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8851911ce11046043b16cb547335e94d
+    m_Address: Assets/_/Levels/Game.unity
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - scene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8cc620abb3564285b3c0cd57e5ae7eec
+    m_Address: Assets/_/Features/Symlink/Editor/SymlinkWindowEditorComponents.cs
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8ebecdd6144941d28ff896e2d611b8ef
+    m_Address: Assets/_/Features/SceneLoader/Data/AssetReferenceSceneData.cs
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 96c23312839ea9f499947a56ddfc784e
+    m_Address: Assets/_/Graphics
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9a2ff5f9cc084f3da6675c9bb595fb6d
+    m_Address: Assets/_/Features/AddressableTools/Editor/AddressableBuildButton.cs
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ab66591f44037df4d807815f1d46c1b3
     m_Address: Assets\_\Levels\MainMenu\MainMenu.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: adf19d94cce7ef84887193b15d091a75
+    m_Address: Assets/_/Features/SceneLoader/Editor/SceneLoader.Editor.asmdef
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b297e7b283e5b7b43898c448736e82a7
+    m_Address: Assets/_/Features/Symlink/Editor/Symlink.Editor.asmdef
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b5c3a8f8afdd8254e8416145fc115fac
+    m_Address: Assets/_/Features
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bafffd377ca9d8f41a9f3bbf3c072a81
+    m_Address: Assets/_
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bfc562ed7aa8c774ab7db2047b93a69d
+    m_Address: Assets/_/Levels/MainMenu/scenes
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c072fadb2609a3d46851705c83d58766
+    m_Address: Assets/_/Features/SceneLoader/Runtime/SceneDataState.cs
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c24036fcaacdfa54dab033991b36c34a
+    m_Address: Assets/_/Levels
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c63eafdbdf2b05845aaaf9a85921d66d
+    m_Address: Assets/_/Levels/Persistent-game
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ce81619d4cbfa3145a8b37c32e623386
+    m_Address: Assets/_/Features/FeatureFactory/Editor/FeatureFactory.Editor.asmdef
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ced3d2e297a259c4c8d89f30bf5eeb43
+    m_Address: Assets/_/Features/Symlink/Runtime
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d484355c9781e3246800bad42dda0baa
+    m_Address: Assets/_/Features/Symlink/Runtime/Symlink.Runtime.asmdef
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d54fca163f8111a4db2b04de67aae9f0
+    m_Address: Assets/_/Features/Toolbar/Editor
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: da36f823d6ff51b4c8fa52118d367475
+    m_Address: Assets/_/Features/Toolbar/Editor/Toolbar.Editor.asmdef
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dcf6e839e39953c48b2e41da94c924a7
+    m_Address: Assets/_/Features/SceneLoader/Editor/SceneDataField.cs
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: de35b10364db1f04b9818d67eb0ed3e4
+    m_Address: Assets/_/Levels/TestScene.unity
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - scene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e1fcb7360fd65a34abd30010d9c6a876
+    m_Address: Assets/_/Features/Misc
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e5b9597fc3a6d854e8fb9d29fc55477a
+    m_Address: Assets/_/Features/SceneLoader/Data
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: eaad368c530c4e87a145d4085515e2da
+    m_Address: Assets/_/Features/SceneLoader/Editor/SceneDataLoaderRuntimeOverride.cs
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ec31c95330a7a044dae453571a7e56a9
+    m_Address: Assets/_/Features/SceneLoader
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ef49db1bb3b620b42ae657f7a87e80d8
+    m_Address: Assets/_/Features/AddressableTools/Editor/AddressableTools.Editor.asmdef
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f097a635c4914c19aad749b0518183a1
+    m_Address: Assets/_/Features/Toolbar/Editor/ToggleToolsDropdown.cs
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f26313c5df2751146a050f34c81354be
+    m_Address: Assets/_/Levels/MainMenu
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

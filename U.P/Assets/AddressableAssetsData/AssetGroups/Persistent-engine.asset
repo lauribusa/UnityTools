@@ -18,7 +18,7 @@ MonoBehaviour:
   m_GUID: 26d6aae585ba756499245d536d5a502c
   m_SerializeEntries:
   - m_GUID: 1bdebbeaa06cfa84c96ace5964496ecc
-    m_Address: Assets\_\Levels\Persistent-engine\Persistent-engine.asset
+    m_Address: Assets/_/Levels/Persistent-engine/Persistent-engine.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -27,6 +27,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - scene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ef859e55e00e7c944942cb45215c818a
+    m_Address: Assets/_/Levels/Persistent-engine/scenes
+    m_ReadOnly: 0
+    m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 1afc60e795d3a56498578fa71d11f3dc, type: 2}
