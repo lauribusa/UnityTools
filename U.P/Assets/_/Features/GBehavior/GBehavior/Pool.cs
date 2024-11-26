@@ -1,84 +1,49 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace GBehavior
 {
     public static class PoolManager
     {
-        private static List<IPool> pools = new();
-
-        public static IPool CreatePool(int size, Type poolType)
+        private static readonly Dictionary<Type, Pool<IPoolable>> _pools = new();
+        public static Pool<T> GetPool<T>() where T : IPoolable
         {
-            for (int i = 0; i < pools.Count; i++)
+            if (_pools.ContainsKey(typeof(T)))
             {
-                var pool = pools[i];
-                if (pool.DataType != poolType)
-                {
-                    var newPool = new Pool<poolType>();
-                }
-                pool.RefreshPoolSize(size);
-                return pool;
+                return _pools[typeof(T)] as Pool<T>;
             }
+            return null;
+        }
+
+        public static Pool<T> CreatePool<T>(int size) where T : IPoolable
+        {
+            if (_pools.ContainsKey(typeof(T)))
+            {
+                if (_pools[typeof(T)].Size >= size) return _pools[typeof(T)] as Pool<T>;
+                _pools[typeof(T)].RefreshPoolSize(size);
+                return _pools[typeof(T)] as Pool<T>;
+            }
+            var newPool = new Pool<T>(size);
+            _pools.Add(typeof(T), newPool as Pool<IPoolable>);
+            return newPool;
         }
     }
-    public interface IPool
-    {
-        Type DataType { get; }
-        object[] Elements { get; set; }
 
-        public void RefreshPoolSize(int size);
-    }
-    public interface IPool<T> : IPool where T: Object
+    public interface IPoolable
     {
-        new T[] Elements { get; set; }
+        public int Id { get; set; }
+        public bool InUse { get; set; }
     }
-    public struct Pool<T>: IPool<T> where T: Object
+
+    public class Pool<T> where T : IPoolable
     {
         public int Size => Elements.Length;
         public T[] Elements { get; set; }
+
         public Pool(int size)
         {
-            this.Elements = new T[size];
-            DataType = typeof(T);
-        }
-
-        /// <summary>
-        /// Add an element to the pool. Will return nothing if no free index are found.
-        /// </summary>
-        /// <param name="element"></param>
-        public void Add(T element)
-        {
-            var index = FindFreeIndex();
-            if (index == -1)
-            {
-                Debug.LogError($"Could not find any free index in pool for element {element.name}", element);
-                return;
-            }
-            Elements[index] = element;
-        }
-
-        private int FindFreeIndex()
-        {
-            for (int i = 0; i < Elements.Length; i++)
-            {
-                if (Elements[i] == null)
-                {
-                    return i;
-                }
-            }
-            return -1;
-        }
-
-        public int FindIndexOf(T element)
-        {
-            for (int i = 0; i < Elements.Length; i++)
-            {
-                if (Elements[i] != element) continue;
-                return i;
-            }
-            return -1;
+            Elements = new T[size];
         }
 
         public void RefreshPoolSize(int size)
@@ -89,30 +54,52 @@ namespace GBehavior
             elements.CopyTo(Elements, 0);
         }
 
-        public T Remove(T element = null)
+        public void Place(T element)
         {
-            var value = Elements[^1];
-            if (element == null)
-            {
-                Elements[^1] = default;
-                return value;
-            }
-
             for (int i = 0; i < Elements.Length; i++)
             {
-                if (Elements[i] != element) continue;
-                value = Elements[i];
-                Elements[i] = default;
-                return value;
+                if (Elements[i] is not null) continue;
+                Elements[i] = element;
+                Elements[i].Id = i;
+                return;
             }
-            return default;
         }
 
-        public Type DataType { get; }
-        object[] IPool.Elements
+        public T Take()
         {
-            get => Elements;
-            set => Elements = (T[])value;
+            var free = FindFreeElement();
+            if (free == null)
+            {
+                Debug.LogError($"Could not find any free index in pool");
+                return default;
+            }
+
+            free.InUse = true;
+            return free;
+        }
+
+        public void Free(int index)
+        {
+            if (index <= 0 || index >= Elements.Length) return;
+            Elements[index].InUse = false;
+        }
+
+        public void Free(T element)
+        {
+            if (element == null) return;
+            Free(element.Id);
+        }
+
+        private T FindFreeElement()
+        {
+            for (int i = 0; i < Elements.Length; i++)
+            {
+                if (!Elements[i].InUse)
+                {
+                    return Elements[i];
+                }
+            }
+            return default;
         }
     }
 }

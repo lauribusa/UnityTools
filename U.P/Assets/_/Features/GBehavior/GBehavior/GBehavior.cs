@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -7,10 +6,11 @@ using Object = UnityEngine.Object;
 
 namespace GBehavior
 {
-    public class GBehavior : MonoBehaviour
+    public class GBehavior : MonoBehaviour, IPoolable
     {
         #region Public
-
+        public int Id { get; set; }
+        public bool InUse { get; set; }
         public bool verbose;
         public bool display;
 
@@ -47,16 +47,6 @@ namespace GBehavior
         public override bool Equals(object other)
         {
             return base.Equals(other);
-        }
-
-        private static Dictionary<AsyncOperationHandle<Object>, Action<Object>> actions = new();
-        private static Action<Object> GenerateCallback(Action<Object> callback)
-        {
-            return callback ?? DefaultCallback;
-        }
-
-        private static void DefaultCallback(Object obj)
-        {
         }
 
         public static void Spawn(AssetReference original, Action<Object> callback = null, int pool = 0)
@@ -131,6 +121,11 @@ namespace GBehavior
                 Instantiate(result, position, rotation, parent);
                 callback?.Invoke(result);
             }
+        }
+
+        private static void CreatePool(int size)
+        {
+            var pool = PoolManager.CreatePool<GBehavior>(size);
         }
 
         public static void Release()
