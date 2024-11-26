@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace GBehavior
 {
     public static class PoolManager
     {
-        private static readonly Dictionary<Type, Pool<IPoolable>> _pools = new();
-        public static Pool<T> GetPool<T>() where T : IPoolable
+        private static readonly Dictionary<Type, Pool<Object>> _pools = new();
+        public static Pool<T> GetPool<T>() where T : Object
         {
             if (_pools.ContainsKey(typeof(T)))
             {
@@ -16,66 +17,77 @@ namespace GBehavior
             return null;
         }
 
-        public static Pool<T> CreatePool<T>(int size) where T : IPoolable
+        public static Pool<T> CreatePool<T>(int size) where T : Object
         {
             if (_pools.ContainsKey(typeof(T)))
             {
-                if (_pools[typeof(T)].Size >= size) return _pools[typeof(T)] as Pool<T>;
-                _pools[typeof(T)].RefreshPoolSize(size);
+                if (_pools[typeof(T)].CountFree() >= size) return _pools[typeof(T)] as Pool<T>;
+                var difference = size - _pools[typeof(T)].CountFree();
+                _pools[typeof(T)].RefreshPoolSize(_pools[typeof(T)].Size + difference);
                 return _pools[typeof(T)] as Pool<T>;
             }
             var newPool = new Pool<T>(size);
-            _pools.Add(typeof(T), newPool as Pool<IPoolable>);
+            _pools.Add(typeof(T), newPool as Pool<Object>);
             return newPool;
         }
     }
 
-    public interface IPoolable
+    public struct Poolable<T> where T : Object
     {
         public int Id { get; set; }
         public bool InUse { get; set; }
+        public T Item { get; set; }
     }
 
-    public class Pool<T> where T : IPoolable
+    public class Pool<T> where T: Object
     {
+        public Type Type { get; private set; }
         public int Size => Elements.Length;
-        public T[] Elements { get; set; }
+        public Poolable<T>[] Elements { get; set; }
 
         public Pool(int size)
         {
-            Elements = new T[size];
+            Elements = new Poolable<T>[size];
+            Type = typeof(T);
         }
+        
+        public int CountFree()
+        {
+            var count = 0;
+            for (int i = 0; i < Elements.Length; i++)
+            {
+                if (!Elements[i].InUse) count++;
+            }
+            return count;
+        }
+
+        public int CountInUse => Size - CountFree();
 
         public void RefreshPoolSize(int size)
         {
             if (size <= Elements.Length) return;
             var elements = Elements;
-            Elements = new T[size];
+            Elements = new Poolable<T>[size];
             elements.CopyTo(Elements, 0);
+            Debug.LogWarning($"WARNING: Pool size has been extended.");
         }
 
-        public void Place(T element)
+        public void Place(T element, int index)
         {
-            for (int i = 0; i < Elements.Length; i++)
-            {
-                if (Elements[i] is not null) continue;
-                Elements[i] = element;
-                Elements[i].Id = i;
-                return;
-            }
+            Elements[index].Item = element;
+            Elements[index].Id = index;
         }
 
         public T Take()
         {
-            var free = FindFreeElement();
-            if (free == null)
+            var poolable = FindFreeElement();
+            if (!poolable.Item)
             {
                 Debug.LogError($"Could not find any free index in pool");
                 return default;
             }
-
-            free.InUse = true;
-            return free;
+            poolable.InUse = true;
+            return poolable.Item;
         }
 
         public void Free(int index)
@@ -87,10 +99,20 @@ namespace GBehavior
         public void Free(T element)
         {
             if (element == null) return;
-            Free(element.Id);
+            var poolable = Find(element);
+            Free(poolable.Id);
         }
 
-        private T FindFreeElement()
+        private Poolable<T> Find(T element)
+        {
+            for (int i = 0; i < Elements.Length; i++)
+            {
+                if(Elements[i].Item == element) return Elements[i];
+            }
+            return default;
+        }
+
+        private Poolable<T> FindFreeElement()
         {
             for (int i = 0; i < Elements.Length; i++)
             {

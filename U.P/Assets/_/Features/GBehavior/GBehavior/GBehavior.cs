@@ -6,9 +6,10 @@ using Object = UnityEngine.Object;
 
 namespace GBehavior
 {
-    public class GBehavior : MonoBehaviour, IPoolable
+    public class GBehavior : MonoBehaviour
     {
         #region Public
+
         public int Id { get; set; }
         public bool InUse { get; set; }
         public bool verbose;
@@ -49,7 +50,8 @@ namespace GBehavior
             return base.Equals(other);
         }
 
-        public static void Spawn(AssetReference original, Action<Object> callback = null, int pool = 0)
+        public static void Spawn<T>(AssetReference original, Action<Object> callback = null, int pool = 0)
+            where T : Object
         {
             var handler = original.LoadAssetAsync<Object>();
             handler.Completed += OnLoadCompleted;
@@ -58,13 +60,26 @@ namespace GBehavior
             void OnLoadCompleted(AsyncOperationHandle<Object> handler)
             {
                 var result = handler.Result;
-                Instantiate(result);
-                callback?.Invoke(result);
+                if (pool <= 0)
+                {
+                    Instantiate(result);
+                    callback?.Invoke(result);
+                }
+                else
+                {
+                    var newPool = PoolManager.CreatePool<T>(pool);
+                    for (int i = 0; i < pool; i++)
+                    {
+                        var obj = Instantiate(result);
+                        if (obj is T poolable) newPool.Place(poolable, i);
+                        callback?.Invoke(obj);
+                    }
+                }
             }
         }
 
-        public static void Spawn(AssetReference original, Transform parent, Action<Object> callback = null,
-            int pool = 0)
+        public static void Spawn<T>(AssetReference original, Transform parent, Action<Object> callback = null,
+            int pool = 0) where T : Object
         {
             var handler = original.LoadAssetAsync<Object>();
             handler.Completed += OnLoadCompleted;
@@ -73,13 +88,26 @@ namespace GBehavior
             void OnLoadCompleted(AsyncOperationHandle<Object> handler)
             {
                 var result = handler.Result;
-                Instantiate(result, parent);
-                callback?.Invoke(result);
+                if (pool <= 0)
+                {
+                    Instantiate(result, parent);
+                    callback?.Invoke(result);
+                }
+                else
+                {
+                    var newPool = PoolManager.CreatePool<T>(pool);
+                    for (int i = 0; i < pool; i++)
+                    {
+                        var obj = Instantiate(result, parent);
+                        if (obj is T poolable) newPool.Place(poolable, i);
+                        callback?.Invoke(obj);
+                    }
+                }
             }
         }
 
-        public static void Spawn(AssetReference original, Transform parent, bool instantiateInWorldSpace,
-            Action<Object> callback = null, int pool = 0)
+        public static void Spawn<T>(AssetReference original, Transform parent, bool instantiateInWorldSpace,
+            Action<Object> callback = null, int pool = 0) where T : Object
         {
             var handler = original.LoadAssetAsync<Object>();
             handler.Completed += OnLoadCompleted;
@@ -88,13 +116,26 @@ namespace GBehavior
             void OnLoadCompleted(AsyncOperationHandle<Object> handler)
             {
                 var result = handler.Result;
-                Instantiate(result, parent, instantiateInWorldSpace);
-                callback?.Invoke(result);
+                if (pool <= 0)
+                {
+                    Instantiate(result, parent, instantiateInWorldSpace);
+                    callback?.Invoke(result);
+                }
+                else
+                {
+                    var newPool = PoolManager.CreatePool<T>(pool);
+                    for (int i = 0; i < pool; i++)
+                    {
+                        var obj = Instantiate(result, parent, instantiateInWorldSpace);
+                        if (obj is T poolable) newPool.Place(poolable, i);
+                        callback?.Invoke(obj);
+                    }
+                }
             }
         }
 
-        public static void Spawn(AssetReference original, Vector3 position, Quaternion rotation,
-            Action<Object> callback = null, int pool = 0)
+        public static void Spawn<T>(AssetReference original, Vector3 position, Quaternion rotation,
+            Action<Object> callback = null, int pool = 0) where T : Object
         {
             var handler = original.LoadAssetAsync<Object>();
             handler.Completed += OnLoadCompleted;
@@ -103,13 +144,26 @@ namespace GBehavior
             void OnLoadCompleted(AsyncOperationHandle<Object> handler)
             {
                 var result = handler.Result;
-                Instantiate(result, position, rotation);
-                callback?.Invoke(result);
+                if (pool <= 0)
+                {
+                    Instantiate(result, position, rotation);
+                    callback?.Invoke(result);
+                }
+                else
+                {
+                    var newPool = PoolManager.CreatePool<T>(pool);
+                    for (int i = 0; i < pool; i++)
+                    {
+                        var obj = Instantiate(result, position, rotation);
+                        if (obj is T poolable) newPool.Place(poolable, i);
+                        callback?.Invoke(obj);
+                    }
+                }
             }
         }
 
-        public static void Spawn(AssetReference original, Vector3 position, Quaternion rotation, Transform parent,
-            Action<Object> callback = null, int pool = 0)
+        public static void Spawn<T>(AssetReference original, Vector3 position, Quaternion rotation, Transform parent,
+            Action<Object> callback = null, int pool = 0) where T : Object
         {
             var handler = original.LoadAssetAsync<Object>();
             handler.Completed += OnLoadCompleted;
@@ -118,25 +172,54 @@ namespace GBehavior
             void OnLoadCompleted(AsyncOperationHandle<Object> handler)
             {
                 var result = handler.Result;
-                Instantiate(result, position, rotation, parent);
-                callback?.Invoke(result);
+                if (pool <= 0)
+                {
+                    Instantiate(result, position, rotation, parent);
+                    callback?.Invoke(result);
+                }
+                else
+                {
+                    var newPool = PoolManager.CreatePool<T>(pool);
+                    for (int i = 0; i < pool; i++)
+                    {
+                        var obj = Instantiate(result, position, rotation, parent);
+                        if (obj is T poolable) newPool.Place(poolable, i);
+                        callback?.Invoke(obj);
+                    }
+                }
             }
         }
 
-        private static void CreatePool(int size)
+        public static T Take<T>() where T : Object
         {
-            var pool = PoolManager.CreatePool<GBehavior>(size);
+            var pool = PoolManager.GetPool<T>();
+            return pool.Take();
         }
 
-        public static void Release()
+        public static GBehavior Take()
         {
+            var pool = PoolManager.GetPool<GBehavior>();
+            return pool.Take();
+        }
+
+        public void Release<T>() where T : Object
+        {
+            var pool = PoolManager.GetPool<T>();
+            pool.Free(Id);
+            gameObject.SetActive(false);
+        }
+
+        public void Release()
+        {
+            var pool = PoolManager.GetPool<GBehavior>();
+            pool.Free(Id);
+            gameObject.SetActive(false);
         }
 
         #endregion
 
         #region Main
-        
-        
+
         #endregion
 
         #region Debug
