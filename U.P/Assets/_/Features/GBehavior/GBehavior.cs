@@ -6,12 +6,9 @@ using Object = UnityEngine.Object;
 
 namespace GBehavior
 {
-    public class GBehavior : MonoBehaviour
+    public abstract class GBehavior : MonoBehaviour
     {
         #region Public
-
-        public int Id { get; set; }
-        public bool InUse { get; set; }
         public bool verbose;
         public bool display;
 
@@ -23,31 +20,38 @@ namespace GBehavior
 
         #region Unity API
 
-        public void Start()
+        internal virtual void Awake() => Register();
+
+        internal virtual void Start() => Register();
+
+        internal virtual void OnUpdate(float deltaTime)
         {
         }
 
-        public void Update()
+        internal virtual void OnFixedUpdate(float fixedDeltaTime)
         {
+            
         }
 
-        public void FixedUpdate()
+        internal virtual void OnLateUpdate(float deltaTime)
         {
+            
+        }
+        
+        internal virtual void OnDestroy() => Debug.Log($"Destroy");
+
+        internal virtual void OnEnable() => Register();
+        
+        internal virtual void OnDisable() => Unregister();
+
+        private void Register()
+        {
+            BehaviorManager.Instance.Add(this);
         }
 
-        public override int GetHashCode()
+        private void Unregister()
         {
-            return base.GetHashCode();
-        }
-
-        public override string ToString()
-        {
-            return base.ToString();
-        }
-
-        public override bool Equals(object other)
-        {
-            return base.Equals(other);
+            BehaviorManager.Instance.Remove(this);
         }
 
         public static void Spawn<T>(AssetReference original, Action<Object> callback = null, int pool = 0)
@@ -71,7 +75,7 @@ namespace GBehavior
                     for (int i = 0; i < pool; i++)
                     {
                         var obj = Instantiate(result);
-                        if (obj is T poolable) newPool.Place(poolable, i);
+                        newPool.Place(obj, i);
                         callback?.Invoke(obj);
                     }
                 }
@@ -99,7 +103,7 @@ namespace GBehavior
                     for (int i = 0; i < pool; i++)
                     {
                         var obj = Instantiate(result, parent);
-                        if (obj is T poolable) newPool.Place(poolable, i);
+                        newPool.Place(obj, i);
                         callback?.Invoke(obj);
                     }
                 }
@@ -127,7 +131,7 @@ namespace GBehavior
                     for (int i = 0; i < pool; i++)
                     {
                         var obj = Instantiate(result, parent, instantiateInWorldSpace);
-                        if (obj is T poolable) newPool.Place(poolable, i);
+                        newPool.Place(obj, i);
                         callback?.Invoke(obj);
                     }
                 }
@@ -154,8 +158,8 @@ namespace GBehavior
                     var newPool = PoolManager.CreatePool<T>(pool);
                     for (int i = 0; i < pool; i++)
                     {
-                        var obj = Instantiate(result, position, rotation);
-                        if (obj is T poolable) newPool.Place(poolable, i);
+                        var obj = (T)Instantiate(result, position, rotation);
+                        newPool.Place(obj, i);
                         callback?.Invoke(obj);
                     }
                 }
@@ -183,7 +187,7 @@ namespace GBehavior
                     for (int i = 0; i < pool; i++)
                     {
                         var obj = Instantiate(result, position, rotation, parent);
-                        if (obj is T poolable) newPool.Place(poolable, i);
+                        newPool.Place(obj, i);
                         callback?.Invoke(obj);
                     }
                 }
@@ -193,26 +197,26 @@ namespace GBehavior
         public static T Take<T>() where T : Object
         {
             var pool = PoolManager.GetPool<T>();
-            return pool.Take();
+            return pool.Take<T>();
         }
 
         public static GBehavior Take()
         {
             var pool = PoolManager.GetPool<GBehavior>();
-            return pool.Take();
+            return pool.Take<GBehavior>();
         }
 
         public void Release<T>() where T : Object
         {
             var pool = PoolManager.GetPool<T>();
-            pool.Free(Id);
+            pool.Free(this as T);
             gameObject.SetActive(false);
         }
 
         public void Release()
         {
             var pool = PoolManager.GetPool<GBehavior>();
-            pool.Free(Id);
+            pool.Free(this);
             gameObject.SetActive(false);
         }
 
