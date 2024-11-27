@@ -3,14 +3,78 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using Object = UnityEngine.Object;
+using Unity.Entities;
 
 namespace GBehavior
 {
     public abstract class GBehavior : MonoBehaviour
     {
         #region Public
+
         public bool verbose;
         public bool display;
+
+        #endregion
+
+        #region Component Accessors
+
+        [NonSerialized] private Transform _transform;
+        public new Transform transform => _transform ??= GetComponent<Transform>();
+
+        [NonSerialized] private Animation _animation;
+
+        public new Animation animation =>
+            _animation ??= GetComponent<Animation>();
+
+        [NonSerialized] private Camera _camera;
+
+        public new Camera camera =>
+            _camera ??= GetComponent<Camera>();
+
+        [NonSerialized] private Collider _collider;
+
+        public new Collider collider =>
+            _collider ??= GetComponent<Collider>();
+
+        [NonSerialized] private Collider2D _collider2D;
+
+        public new Collider2D collider2D =>
+            _collider2D ??= GetComponent<Collider2D>();
+
+        [NonSerialized] private ConstantForce _constantForce;
+
+        public new ConstantForce constantForce =>
+            _constantForce ??= GetComponent<ConstantForce>();
+
+        [NonSerialized] private HingeJoint _hingeJoint;
+
+        public new HingeJoint hingeJoint =>
+            _hingeJoint ??= GetComponent<HingeJoint>();
+
+        [NonSerialized] private Light _light;
+
+        public new Light light =>
+            _light ??= GetComponent<Light>();
+
+        [NonSerialized] private ParticleSystem _particleSystem;
+
+        public new ParticleSystem particleSystem =>
+            _particleSystem ??= GetComponent<ParticleSystem>();
+
+        [NonSerialized] private Renderer _renderer;
+
+        public new Renderer renderer =>
+            _renderer ??= GetComponent<Renderer>();
+
+        [NonSerialized] private Rigidbody _rigidbody;
+
+        public new Rigidbody rigidbody =>
+            _rigidbody ??= GetComponent<Rigidbody>();
+
+        [NonSerialized] private Rigidbody2D _rigidbody2D;
+
+        public new Rigidbody2D rigidbody2D =>
+            _rigidbody2D ??= GetComponent<Rigidbody2D>();
 
         #endregion
 
@@ -24,24 +88,28 @@ namespace GBehavior
 
         internal virtual void Start() => Register();
 
-        internal virtual void OnUpdate(float deltaTime)
+        /// <summary>
+        /// Called every update depending on the LODGroup.
+        /// </summary>
+        /// <param name="deltaTime">Time delta since the last OnUpdate call</param>
+        /// <param name="unscaledDeltaTime">Time delta since the last OnUpdate call, unaffected by TimeScale</param>
+        /// <param name="ticks">Number of ticks since the last OnUpdate call</param>
+        internal virtual void OnUpdate(float deltaTime, float unscaledDeltaTime, int ticks)
         {
         }
 
-        internal virtual void OnFixedUpdate(float fixedDeltaTime)
+        internal virtual void OnFixedUpdate(float fixedDeltaTime, float fixedUnscaledDeltaTime, int ticks)
         {
-            
         }
 
-        internal virtual void OnLateUpdate(float deltaTime)
+        internal virtual void OnLateUpdate(float deltaTime, float unscaledDeltaTime, int ticks)
         {
-            
         }
-        
+
         internal virtual void OnDestroy() => Debug.Log($"Destroy");
 
         internal virtual void OnEnable() => Register();
-        
+
         internal virtual void OnDisable() => Unregister();
 
         private void Register()
@@ -54,7 +122,7 @@ namespace GBehavior
             BehaviorManager.Instance.Remove(this);
         }
 
-        public static void Spawn<T>(AssetReference original, Action<Object> callback = null, int pool = 0)
+        public static void Spawn<T>(AssetReference original, Action<T> callback = null)
             where T : Object
         {
             var handler = original.LoadAssetAsync<Object>();
@@ -63,27 +131,15 @@ namespace GBehavior
 
             void OnLoadCompleted(AsyncOperationHandle<Object> handler)
             {
-                var result = handler.Result;
-                if (pool <= 0)
-                {
-                    Instantiate(result);
-                    callback?.Invoke(result);
-                }
-                else
-                {
-                    var newPool = PoolManager.CreatePool<T>(pool);
-                    for (int i = 0; i < pool; i++)
-                    {
-                        var obj = Instantiate(result);
-                        newPool.Place(obj, i);
-                        callback?.Invoke(obj);
-                    }
-                }
+                var result = (T)handler.Result;
+
+                Instantiate(result);
+                callback?.Invoke(result);
             }
         }
 
-        public static void Spawn<T>(AssetReference original, Transform parent, Action<Object> callback = null,
-            int pool = 0) where T : Object
+        public static void Spawn<T>(AssetReference original, int poolSize, Action<Pool> callback)
+            where T : Object
         {
             var handler = original.LoadAssetAsync<Object>();
             handler.Completed += OnLoadCompleted;
@@ -91,27 +147,57 @@ namespace GBehavior
 
             void OnLoadCompleted(AsyncOperationHandle<Object> handler)
             {
-                var result = handler.Result;
-                if (pool <= 0)
+                var result = (T)handler.Result;
+
+                var newPool = PoolManager.GetOrCreatePool<T>(poolSize);
+                for (int i = 0; i < poolSize; i++)
                 {
-                    Instantiate(result, parent);
-                    callback?.Invoke(result);
+                    var obj = Instantiate(result);
+                    newPool.Place(obj, i);
                 }
-                else
+
+                callback?.Invoke(newPool);
+            }
+        }
+
+        public static void Spawn<T>(AssetReference original, Transform parent, Action<T> callback = null)
+            where T : Object
+        {
+            var handler = original.LoadAssetAsync<Object>();
+            handler.Completed += OnLoadCompleted;
+            return;
+
+            void OnLoadCompleted(AsyncOperationHandle<Object> handler)
+            {
+                var result = (T)handler.Result;
+                Instantiate(result, parent);
+                callback?.Invoke(result);
+            }
+        }
+
+        public static void Spawn<T>(AssetReference original, Transform parent, int poolSize, Action<Pool> callback)
+            where T : Object
+        {
+            var handler = original.LoadAssetAsync<Object>();
+            handler.Completed += OnLoadCompleted;
+            return;
+
+            void OnLoadCompleted(AsyncOperationHandle<Object> handler)
+            {
+                var result = (T)handler.Result;
+                var newPool = PoolManager.GetOrCreatePool<T>(poolSize);
+                for (int i = 0; i < poolSize; i++)
                 {
-                    var newPool = PoolManager.CreatePool<T>(pool);
-                    for (int i = 0; i < pool; i++)
-                    {
-                        var obj = Instantiate(result, parent);
-                        newPool.Place(obj, i);
-                        callback?.Invoke(obj);
-                    }
+                    var obj = Instantiate(result, parent);
+                    newPool.Place(obj, i);
                 }
+
+                callback?.Invoke(newPool);
             }
         }
 
         public static void Spawn<T>(AssetReference original, Transform parent, bool instantiateInWorldSpace,
-            Action<Object> callback = null, int pool = 0) where T : Object
+            Action<T> callback = null) where T : Object
         {
             var handler = original.LoadAssetAsync<Object>();
             handler.Completed += OnLoadCompleted;
@@ -119,27 +205,37 @@ namespace GBehavior
 
             void OnLoadCompleted(AsyncOperationHandle<Object> handler)
             {
-                var result = handler.Result;
-                if (pool <= 0)
+                var result = (T)handler.Result;
+
+                Instantiate(result, parent, instantiateInWorldSpace);
+                callback?.Invoke(result);
+            }
+        }
+
+        public static void Spawn<T>(AssetReference original, Transform parent, bool instantiateInWorldSpace,
+            int poolSize, Action<Pool> callback) where T : Object
+        {
+            var handler = original.LoadAssetAsync<Object>();
+            handler.Completed += OnLoadCompleted;
+            return;
+
+            void OnLoadCompleted(AsyncOperationHandle<Object> handler)
+            {
+                var result = (T)handler.Result;
+
+                var newPool = PoolManager.GetOrCreatePool<T>(poolSize);
+                for (int i = 0; i < poolSize; i++)
                 {
-                    Instantiate(result, parent, instantiateInWorldSpace);
-                    callback?.Invoke(result);
+                    var obj = Instantiate(result, parent, instantiateInWorldSpace);
+                    newPool.Place(obj, i);
                 }
-                else
-                {
-                    var newPool = PoolManager.CreatePool<T>(pool);
-                    for (int i = 0; i < pool; i++)
-                    {
-                        var obj = Instantiate(result, parent, instantiateInWorldSpace);
-                        newPool.Place(obj, i);
-                        callback?.Invoke(obj);
-                    }
-                }
+
+                callback?.Invoke(newPool);
             }
         }
 
         public static void Spawn<T>(AssetReference original, Vector3 position, Quaternion rotation,
-            Action<Object> callback = null, int pool = 0) where T : Object
+            Action<T> callback = null) where T : Object
         {
             var handler = original.LoadAssetAsync<Object>();
             handler.Completed += OnLoadCompleted;
@@ -147,27 +243,36 @@ namespace GBehavior
 
             void OnLoadCompleted(AsyncOperationHandle<Object> handler)
             {
-                var result = handler.Result;
-                if (pool <= 0)
+                var result = (T)handler.Result;
+                var obj = Instantiate(result, position, rotation);
+                callback?.Invoke(obj);
+            }
+        }
+
+        public static void Spawn<T>(AssetReference original, Vector3 position, Quaternion rotation,
+            int poolSize, Action<Pool> callback) where T : Object
+        {
+            var handler = original.LoadAssetAsync<Object>();
+            handler.Completed += OnLoadCompleted;
+            return;
+
+            void OnLoadCompleted(AsyncOperationHandle<Object> handler)
+            {
+                var result = (T)handler.Result;
+
+                var newPool = PoolManager.GetOrCreatePool<T>(poolSize);
+                for (int i = 0; i < poolSize; i++)
                 {
-                    Instantiate(result, position, rotation);
-                    callback?.Invoke(result);
+                    var obj = Instantiate(result, position, rotation);
+                    newPool.Place(obj, i);
                 }
-                else
-                {
-                    var newPool = PoolManager.CreatePool<T>(pool);
-                    for (int i = 0; i < pool; i++)
-                    {
-                        var obj = (T)Instantiate(result, position, rotation);
-                        newPool.Place(obj, i);
-                        callback?.Invoke(obj);
-                    }
-                }
+
+                callback?.Invoke(newPool);
             }
         }
 
         public static void Spawn<T>(AssetReference original, Vector3 position, Quaternion rotation, Transform parent,
-            Action<Object> callback = null, int pool = 0) where T : Object
+            Action<T> callback = null) where T : Object
         {
             var handler = original.LoadAssetAsync<Object>();
             handler.Completed += OnLoadCompleted;
@@ -175,47 +280,56 @@ namespace GBehavior
 
             void OnLoadCompleted(AsyncOperationHandle<Object> handler)
             {
-                var result = handler.Result;
-                if (pool <= 0)
+                var result = (T)handler.Result;
+
+                Instantiate(result, position, rotation, parent);
+                callback?.Invoke(result);
+            }
+        }
+
+        public static void Spawn<T>(AssetReference original, Vector3 position, Quaternion rotation, Transform parent,
+            int poolSize, Action<Pool> callback) where T : Object
+        {
+            var handler = original.LoadAssetAsync<Object>();
+            handler.Completed += OnLoadCompleted;
+            return;
+
+            void OnLoadCompleted(AsyncOperationHandle<Object> handler)
+            {
+                var result = (T)handler.Result;
+                var newPool = PoolManager.GetOrCreatePool<T>(poolSize);
+                for (int i = 0; i < poolSize; i++)
                 {
-                    Instantiate(result, position, rotation, parent);
-                    callback?.Invoke(result);
+                    var obj = Instantiate(result, position, rotation, parent);
+                    newPool.Place(obj, i);
                 }
-                else
-                {
-                    var newPool = PoolManager.CreatePool<T>(pool);
-                    for (int i = 0; i < pool; i++)
-                    {
-                        var obj = Instantiate(result, position, rotation, parent);
-                        newPool.Place(obj, i);
-                        callback?.Invoke(obj);
-                    }
-                }
+
+                callback?.Invoke(newPool);
             }
         }
 
         public static T Take<T>() where T : Object
         {
-            var pool = PoolManager.GetPool<T>();
+            var pool = PoolManager.GetPoolOf<T>();
             return pool.Take<T>();
         }
 
         public static GBehavior Take()
         {
-            var pool = PoolManager.GetPool<GBehavior>();
+            var pool = PoolManager.GetPoolOf<GBehavior>();
             return pool.Take<GBehavior>();
         }
 
         public void Release<T>() where T : Object
         {
-            var pool = PoolManager.GetPool<T>();
+            var pool = PoolManager.GetPoolOf<T>();
             pool.Free(this as T);
             gameObject.SetActive(false);
         }
 
         public void Release()
         {
-            var pool = PoolManager.GetPool<GBehavior>();
+            var pool = PoolManager.GetPoolOf<GBehavior>();
             pool.Free(this);
             gameObject.SetActive(false);
         }
@@ -259,5 +373,7 @@ namespace GBehavior
         }
 
         #endregion
+
+        
     }
 }

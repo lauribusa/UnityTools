@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -9,7 +10,7 @@ namespace GBehavior
     public static class PoolManager
     {
         private static readonly Dictionary<Type, Pool> _pools = new();
-        public static Pool GetPool<T>() where T : Object
+        public static Pool GetPoolOf<T>() where T : Object
         {
             if (_pools.ContainsKey(typeof(T)))
             {
@@ -35,7 +36,7 @@ namespace GBehavior
             }
         }
 
-        public static Pool CreatePool<T>(int size) where T : Object
+        public static Pool GetOrCreatePool<T>(int size) where T : Object
         {
             if (_pools.ContainsKey(typeof(T)))
             {
@@ -49,7 +50,7 @@ namespace GBehavior
             return newPool;
         }
     }
-
+    [Serializable]
     public struct Poolable
     {
         public int Id { get; set; }
@@ -57,6 +58,7 @@ namespace GBehavior
         public Object Item { get; set; }
     }
 
+    [Serializable]
     public class Pool
     {
         public int Size => Elements.Length;
@@ -64,7 +66,7 @@ namespace GBehavior
 
         public Pool(int size)
         {
-            Elements = new Poolable[size];
+            Elements = ArrayPool<Poolable>.Shared.Rent(size);
         }
 
         public bool IsOfType<T>()
@@ -88,8 +90,9 @@ namespace GBehavior
         {
             if (size <= Elements.Length) return;
             var elements = Elements;
-            Elements = new Poolable[size];
+            Elements = ArrayPool<Poolable>.Shared.Rent(size);
             elements.CopyTo(Elements, 0);
+            ArrayPool<Poolable>.Shared.Return(elements);
             Debug.LogWarning($"WARNING: Pool size has been extended.");
         }
 

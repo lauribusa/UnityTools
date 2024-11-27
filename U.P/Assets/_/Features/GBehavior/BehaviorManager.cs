@@ -7,42 +7,49 @@ namespace GBehavior
     public class BehaviorManager: MonoBehaviour
     {
         public static BehaviorManager Instance { get; private set; }
-        private List<GBehavior> behaviors = new();
+        private readonly List<UpdateLODGroup> _updateLodGroups = new();
+
+        private const int STRIDE = 1000;
+        private const int FIXED_STRIDE = 1000;
 
         private void Awake()
         {
             Instance ??= this;
-            if (FindObjectsOfType<BehaviorManager>().Length >= 1)
+            if (FindObjectsOfType<BehaviorManager>().Length > 1)
             {
-                DestroyImmediate(gameObject);
+                throw new UnityException("More than one BehaviorManager in the scene");
             }
+            _updateLodGroups.Add(new UpdateLODGroup(STRIDE, FIXED_STRIDE));
+        }
+
+        public void Test()
+        {
+            
         }
 
         public void Add(GBehavior behavior)
         {
-            if (behaviors.Contains(behavior)) return;
-            behaviors.Add(behavior);
+           _updateLodGroups[0].Add(behavior);
         }
 
         public void Remove(GBehavior behavior)
         {
-            if (!behaviors.Contains(behavior)) return;
-            behaviors.Remove(behavior);
+            _updateLodGroups[0].Remove(behavior);
         }
 
         private void Update()
         {
-            for (int i = 0; i < behaviors.Count; i++) behaviors[i].OnUpdate(Time.deltaTime);
+            for (int i = 0; i < _updateLodGroups.Count; i++) _updateLodGroups[i].TickUpdate();
         }
 
         private void FixedUpdate()
         {
-            for (int i = 0; i < behaviors.Count; i++) behaviors[i].OnFixedUpdate(Time.fixedDeltaTime);
+            for (int i = 0; i < _updateLodGroups.Count; i++) _updateLodGroups[i].TickFixedUpdate();
         }
 
         private void LateUpdate()
         {
-            for (int i = 0; i < behaviors.Count; i++) behaviors[i].OnLateUpdate(Time.deltaTime);
+            for (int i = 0; i < _updateLodGroups.Count; i++) _updateLodGroups[i].TickLateUpdate();
         }
     }
 }

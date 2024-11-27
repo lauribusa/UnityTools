@@ -10,19 +10,6 @@ using UnityEngine.UIElements;
 
 namespace SceneLoader.Editor
 {
-    /*
-     * Créer un scriptableobject qui contiendra le nom des addressable group
-pouvoir modifier la création de level
-créer un script editor qui va les scanner
-faire un diff (modifié par rapport au groupe, si oui je rebuilde)
-
-- create scriptableobject "addressable definition"
-- edit "new level logic" to add into scriptableobject
-- "scan everything" to get all files that need to be changed into addressables
-- make a diff with all groups (and perhaps change the UI to mark it red or green on add, remove, etc)
-- Apply to all groups set as Dirty
-- changer le sceneloader pour accepter des addressables
-     */
     public class SceneDataCreationWindow: EditorWindow
     {
         private bool _isFocused;

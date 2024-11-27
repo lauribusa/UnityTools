@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -13,7 +14,7 @@ namespace GBehavior
         private float _timer;
         private bool _isFired;
 
-        public void Start()
+        internal override void Start()
         {
             SpawnNumber();
         }
@@ -32,13 +33,12 @@ namespace GBehavior
 
         private void SpawnNumber()
         {
-            Spawn<GBehavior>(prefab,OnComplete, count);
+            Spawn<GBehavior>(prefab,count,OnCompletePool);
         }
 
-        private void OnComplete(Object obj)
+        private void OnCompletePool(Pool obj)
         {
             var go = obj;
-            myObjects.Add(go);
         }
     }
 }
