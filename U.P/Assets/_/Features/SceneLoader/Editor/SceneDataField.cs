@@ -18,6 +18,8 @@ namespace SceneLoader.Editor
 
         [Serialize]
         public SceneData SceneData;
+        
+        public string Path { get; private set; }
         public void InitializeElement()
         {
             label = "Load:";
@@ -29,8 +31,7 @@ namespace SceneLoader.Editor
             if (evt.newValue is not null)
             {
                 var sceneData = evt.newValue;
-                var path = AssetDatabase.GetAssetPath(sceneData);
-                SessionState.SetString("SceneDataPath", path);
+                Path = AssetDatabase.GetAssetPath(sceneData);
             }
             else
             {

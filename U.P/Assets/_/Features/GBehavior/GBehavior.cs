@@ -1,9 +1,11 @@
 using System;
+using Glue;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using Object = UnityEngine.Object;
 using Unity.Entities;
+using UnityEngine.Jobs;
 
 namespace GBehavior
 {
@@ -122,41 +124,37 @@ namespace GBehavior
             BehaviorManager.Instance.Remove(this);
         }
 
-        public static void Spawn<T>(AssetReference original, Action<T> callback = null)
-            where T : Object
+        public static void Spawn(AssetReference original, Action<GameObject> callback = null)
         {
-            var handler = original.LoadAssetAsync<Object>();
+            var handler = original.InstantiateAsync();
             handler.Completed += OnLoadCompleted;
             return;
 
-            void OnLoadCompleted(AsyncOperationHandle<Object> handler)
+            void OnLoadCompleted(AsyncOperationHandle<GameObject> handler)
             {
-                var result = (T)handler.Result;
-
-                Instantiate(result);
-                callback?.Invoke(result);
+                callback?.Invoke(handler.Result);
             }
         }
 
         public static void Spawn<T>(AssetReference original, int poolSize, Action<Pool> callback)
             where T : Object
         {
-            var handler = original.LoadAssetAsync<Object>();
-            handler.Completed += OnLoadCompleted;
+            var index = 0;
+            var newPool = PoolManager.GetOrCreatePool<T>(poolSize);
+            for (int i = 0; i < poolSize; i++)
+            {
+                var handler = original.InstantiateAsync();
+                handler.Completed += OnLoadCompleted;
+            }
             return;
 
-            void OnLoadCompleted(AsyncOperationHandle<Object> handler)
+            void OnLoadCompleted(AsyncOperationHandle<GameObject> handler)
             {
-                var result = (T)handler.Result;
-
-                var newPool = PoolManager.GetOrCreatePool<T>(poolSize);
-                for (int i = 0; i < poolSize; i++)
-                {
-                    var obj = Instantiate(result);
-                    newPool.Place(obj, i);
-                }
-
-                callback?.Invoke(newPool);
+                var result = handler.Result;
+                var component = result.GetComponent<T>();
+                newPool.Place(component, index);
+                index++;
+                if(index >= poolSize) callback?.Invoke(newPool);
             }
         }
 
@@ -169,9 +167,9 @@ namespace GBehavior
 
             void OnLoadCompleted(AsyncOperationHandle<Object> handler)
             {
-                var result = (T)handler.Result;
+                var result = handler.Result;
                 Instantiate(result, parent);
-                callback?.Invoke(result);
+                callback?.Invoke((T)result);
             }
         }
 
@@ -184,7 +182,7 @@ namespace GBehavior
 
             void OnLoadCompleted(AsyncOperationHandle<Object> handler)
             {
-                var result = (T)handler.Result;
+                var result = handler.Result;
                 var newPool = PoolManager.GetOrCreatePool<T>(poolSize);
                 for (int i = 0; i < poolSize; i++)
                 {
@@ -205,10 +203,10 @@ namespace GBehavior
 
             void OnLoadCompleted(AsyncOperationHandle<Object> handler)
             {
-                var result = (T)handler.Result;
+                var result = handler.Result;
 
                 Instantiate(result, parent, instantiateInWorldSpace);
-                callback?.Invoke(result);
+                callback?.Invoke((T)result);
             }
         }
 
@@ -374,6 +372,21 @@ namespace GBehavior
 
         #endregion
 
-        
+        // Unity.Entities.Baker belongs to Unity.Entities.Hybrid assembly definition. Thanks for never telling us, Unity!!
+        public class Baker : Baker<GBehavior>
+        {
+            public override void Bake(GBehavior authoring)
+            {
+                var entity = GetEntity(TransformUsageFlags.Dynamic);
+                
+                var behaviorLODData = new BehaviorLODData
+                {
+                    GameObjectID = authoring.GetInstanceID(),
+                    CameraTransform = new TransformAccessArray(new []{ Camera.main.transform})
+                };
+                
+                AddComponent(entity, behaviorLODData);
+            }
+        }
     }
 }

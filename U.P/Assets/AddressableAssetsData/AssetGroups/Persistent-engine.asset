@@ -28,6 +28,11 @@ MonoBehaviour:
     m_SerializedLabels:
     - scene
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e5590ed0b12717349acf020e4e600d9d
+    m_Address: Assets/_/Config/AddressableGBehavior.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ef859e55e00e7c944942cb45215c818a
     m_Address: Assets/_/Levels/Persistent-engine/scenes
     m_ReadOnly: 0
